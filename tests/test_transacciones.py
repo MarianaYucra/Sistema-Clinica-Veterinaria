@@ -58,3 +58,14 @@ def test_calcular_total_sin_descuento():
 
 def test_calcular_total_con_descuento_valido():
     assert calcular_total([100, 50], 10) == 135
+
+
+# AVL - Precios
+
+def test_calcular_subtotal_con_precio_minimo_valido():
+    assert calcular_subtotal([0.01]) == 0.01
+
+
+def test_calcular_subtotal_con_precio_limite_invalido_cero():
+    with pytest.raises(ValueError):
+        calcular_subtotal([0])

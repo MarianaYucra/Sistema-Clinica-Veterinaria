@@ -81,3 +81,21 @@ Codigo trabajado:
 
 REFACTOR:
 El descuento quedo con valor por defecto 0 para representar pagos normales sin promocion.
+
+## Fase 5: Limites de precios
+
+RED:
+Se agregaron pruebas para diferenciar entre el precio minimo permitido y el limite invalido.
+
+Casos definidos:
+- Precio 0.01 debe aceptarse como valor minimo valido.
+- Precio 0 debe rechazarse porque no representa un cobro real.
+
+GREEN:
+Se confirmo que la condicion de precios mayores a cero cubre ambos casos.
+
+Codigo trabajado:
+- `calcular_subtotal(precios)`
+
+REFACTOR:
+No se agrego una nueva funcion porque la validacion existente ya cubria el limite de precios.

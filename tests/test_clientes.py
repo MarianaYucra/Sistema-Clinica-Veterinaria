@@ -1,7 +1,7 @@
 import pytest
 
 def test_registrar_cliente_exitoso(cliente_entorno):
-    """Prueba que un cliente válido se registre correctamente (Caso Feliz)."""
+    """Prueba que  cliente válido se registre correctamente (Caso Feliz)."""
     repo, svc = cliente_entorno
     cliente = svc.registrar("12345678", "Juan Perez", "987654321", "j@a.com")
 

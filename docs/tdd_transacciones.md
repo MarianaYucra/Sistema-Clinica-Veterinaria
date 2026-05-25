@@ -61,3 +61,23 @@ Codigo trabajado:
 
 REFACTOR:
 La validacion del descuento quedo separada para que no se repita si luego se usa en otra parte del flujo de pagos.
+
+## Fase 4: Total del pago
+
+RED:
+Se agregaron pruebas para comprobar el total final del pago con y sin descuento.
+
+Casos definidos:
+- Si no se envia descuento, el sistema debe usar 0%.
+- Si se envia un descuento valido, debe restarse del subtotal.
+
+GREEN:
+Se uso `calcular_total(precios, descuento=0)` combinando el subtotal y el monto descontado.
+
+Codigo trabajado:
+- `calcular_total(precios, descuento)`
+- `calcular_subtotal(precios)`
+- `aplicar_descuento(subtotal, descuento)`
+
+REFACTOR:
+El descuento quedo con valor por defecto 0 para representar pagos normales sin promocion.

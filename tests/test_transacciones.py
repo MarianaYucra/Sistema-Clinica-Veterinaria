@@ -1,6 +1,6 @@
 import pytest
 
-from app.main import aplicar_descuento, calcular_subtotal
+from app.main import aplicar_descuento, calcular_subtotal, calcular_total
 
 
 # PE - Subtotal
@@ -48,3 +48,13 @@ def test_aplicar_descuento_menor_a_cero_lanza_error():
 def test_aplicar_descuento_mayor_a_cien_lanza_error():
     with pytest.raises(ValueError):
         aplicar_descuento(100, 101)
+
+
+# PE - Pago total
+
+def test_calcular_total_sin_descuento():
+    assert calcular_total([50, 30]) == 80
+
+
+def test_calcular_total_con_descuento_valido():
+    assert calcular_total([100, 50], 10) == 135

@@ -1,6 +1,6 @@
 import pytest
 
-from app.main import calcular_subtotal
+from app.main import aplicar_descuento, calcular_subtotal, calcular_total
 
 
 # PE - Subtotal
@@ -28,3 +28,44 @@ def test_calcular_subtotal_con_precio_cero_lanza_error():
 def test_calcular_subtotal_con_precio_negativo_lanza_error():
     with pytest.raises(ValueError):
         calcular_subtotal([50, -10])
+
+
+# AVL - Descuentos
+
+def test_aplicar_descuento_con_cero_por_ciento():
+    assert aplicar_descuento(100, 0) == 0
+
+
+def test_aplicar_descuento_con_cien_por_ciento():
+    assert aplicar_descuento(100, 100) == 100
+
+
+def test_aplicar_descuento_menor_a_cero_lanza_error():
+    with pytest.raises(ValueError):
+        aplicar_descuento(100, -1)
+
+
+def test_aplicar_descuento_mayor_a_cien_lanza_error():
+    with pytest.raises(ValueError):
+        aplicar_descuento(100, 101)
+
+
+# PE - Pago total
+
+def test_calcular_total_sin_descuento():
+    assert calcular_total([50, 30]) == 80
+
+
+def test_calcular_total_con_descuento_valido():
+    assert calcular_total([100, 50], 10) == 135
+
+
+# AVL - Precios
+
+def test_calcular_subtotal_con_precio_minimo_valido():
+    assert calcular_subtotal([0.01]) == 0.01
+
+
+def test_calcular_subtotal_con_precio_limite_invalido_cero():
+    with pytest.raises(ValueError):
+        calcular_subtotal([0])

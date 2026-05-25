@@ -335,19 +335,27 @@ def main():
     }
 
     while True:
-        mostrar_menu()
-        opcion = leer_entero("Seleccione una opción: ")
+        try:
+            mostrar_menu()
+            opcion = leer_entero("Seleccione una opción: ")
 
-        if opcion == 0:
-            print("¡Hasta luego!")
+            if opcion == 0:
+                print("¡Hasta luego!")
+                break
+
+            accion = acciones.get(opcion)
+            if accion:
+                try:
+                    accion()
+                except KeyboardInterrupt:
+                    print("\n\n[Operación cancelada por el usuario]")
+            else:
+                print("Opción no válida. Intente de nuevo.")
+        except KeyboardInterrupt:
+            print("\n\n¡Hasta luego!")
             break
-
-        accion = acciones.get(opcion)
-        if accion:
-            accion()
-        else:
-            print("Opción no válida. Intente de nuevo.")
 
 
 if __name__ == "__main__":
     main()
+

@@ -5,7 +5,7 @@
 El módulo de Reportes cubre las siguientes funciones de consulta/lectura:
 
 | # | Función | Servicio |
-|---|---|---|---|
+|---|---|---|
 | R1 | Listar clientes | `ClienteService.listar()` |
 | R2 | Listar veterinarios | `VeterinarioService.listar()` |
 | R3 | Listar mascotas | `MascotaService.listar()` |

@@ -53,6 +53,67 @@ def leer_flotante(mensaje: str) -> float:
             print("Error: Ingrese un número válido.")
 
 
+def validar_descuento(descuento: float):
+    if descuento < 0 or descuento > 100:
+        raise ValueError("El descuento debe estar entre 0 y 100.")
+
+
+def calcular_subtotal(precios):
+    if not precios:
+        raise ValueError("Debe ingresar al menos un servicio.")
+    if any(precio <= 0 for precio in precios):
+        raise ValueError("Los precios deben ser mayores a cero.")
+    return sum(precios)
+
+
+def aplicar_descuento(subtotal: float, descuento: float = 0) -> float:
+    validar_descuento(descuento)
+    return subtotal * (descuento / 100)
+
+
+def calcular_total(precios, descuento: float = 0) -> float:
+    subtotal = calcular_subtotal(precios)
+    monto_descuento = aplicar_descuento(subtotal, descuento)
+    return subtotal - monto_descuento
+
+
+def registrar_pago_atencion():
+    print("\n--- Registrar Pago de Atencion ---")
+    precios = []
+
+    while True:
+        servicio = input("Servicio realizado: ")
+        if not servicio.strip():
+            print("Error: El nombre del servicio no puede estar vacio.")
+            continue
+
+        precio = leer_flotante("Precio del servicio: ")
+        precios.append(precio)
+
+        continuar = input("Agregar otro servicio? (s/n): ")
+        if continuar.strip().lower() != "s":
+            break
+
+    while True:
+        descuento_texto = input("Descuento (%) [Enter si no hay]: ")
+        try:
+            descuento = 0 if not descuento_texto.strip() else float(descuento_texto)
+            break
+        except ValueError:
+            print("Error: Ingrese un numero valido.")
+
+    try:
+        subtotal = calcular_subtotal(precios)
+        monto_descuento = aplicar_descuento(subtotal, descuento)
+        total = calcular_total(precios, descuento)
+        print(f"Subtotal: S/ {subtotal:.2f}")
+        print(f"Descuento: S/ {monto_descuento:.2f}")
+        print(f"Total a pagar: S/ {total:.2f}")
+        print("Pago registrado.")
+    except ValueError as e:
+        print(f"Error: {e}")
+
+
 def registrar_cliente(servicio: ClienteService):
     print("\n--- Registrar Cliente ---")
     id_cliente = input("Cédula/DNI: ")
@@ -212,6 +273,9 @@ def registrar_atencion(servicio: AtencionService):
             f"Atención registrada (Registro #{registro.id_registro}). "
             f"Cita marcada como 'Completada'."
         )
+        opcion_pago = input("Registrar pago de esta atencion? (s/n): ")
+        if opcion_pago.strip().lower() == "s":
+            registrar_pago_atencion()
     except ValueError as e:
         print(f"Error: {e}")
 

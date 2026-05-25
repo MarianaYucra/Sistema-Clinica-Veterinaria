@@ -41,7 +41,6 @@ MVP (Producto Mínimo Viable) de un sistema web para clínica veterinaria desarr
 
 ---
 
-
 ## Reglas de Negocio
 
 | ID Regla | Descripción de la Regla |
@@ -59,10 +58,7 @@ MVP (Producto Mínimo Viable) de un sistema web para clínica veterinaria desarr
 
 ---
 
-## Casos de Prueba — Técnicas de Caja Negra
-
 ### 1. Partición de Equivalencia (PE)
-Divide los datos de entrada en clases equivalentes válidas e inválidas para el entorno de pruebas (`test_clientes.py`):
 
 | Campo / Flujo | Clase Válida | Clase Inválida |
 | :--- | :--- | :--- |

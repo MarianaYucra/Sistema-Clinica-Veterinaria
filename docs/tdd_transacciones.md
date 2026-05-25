@@ -40,3 +40,24 @@ Codigo trabajado:
 
 REFACTOR:
 La validacion quedo en la misma funcion porque el subtotal es el primer punto donde se revisan los precios del pago.
+
+## Fase 3: Descuentos
+
+RED:
+Se agregaron pruebas para revisar los limites permitidos del descuento.
+
+Casos definidos:
+- Descuento de 0% debe generar monto descontado 0.
+- Descuento de 100% debe descontar todo el subtotal.
+- Descuento menor a 0% debe rechazarse.
+- Descuento mayor a 100% debe rechazarse.
+
+GREEN:
+Se uso `validar_descuento(descuento)` desde `aplicar_descuento(subtotal, descuento)` para aceptar solo valores entre 0 y 100.
+
+Codigo trabajado:
+- `validar_descuento(descuento)`
+- `aplicar_descuento(subtotal, descuento)`
+
+REFACTOR:
+La validacion del descuento quedo separada para que no se repita si luego se usa en otra parte del flujo de pagos.

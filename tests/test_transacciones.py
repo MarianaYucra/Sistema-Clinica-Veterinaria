@@ -16,3 +16,15 @@ def test_calcular_subtotal_con_varios_servicios_validos():
 def test_calcular_subtotal_sin_servicios_lanza_error():
     with pytest.raises(ValueError):
         calcular_subtotal([])
+
+
+# PE - Precios invalidos
+
+def test_calcular_subtotal_con_precio_cero_lanza_error():
+    with pytest.raises(ValueError):
+        calcular_subtotal([50, 0])
+
+
+def test_calcular_subtotal_con_precio_negativo_lanza_error():
+    with pytest.raises(ValueError):
+        calcular_subtotal([50, -10])

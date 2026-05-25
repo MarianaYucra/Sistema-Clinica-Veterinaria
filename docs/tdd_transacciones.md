@@ -22,3 +22,21 @@ Codigo trabajado:
 
 REFACTOR:
 La funcion se mantuvo separada porque luego se reutiliza en el calculo del total y en la aplicacion de descuentos.
+
+## Fase 2: Validacion de precios
+
+RED:
+Se agregaron pruebas para evitar pagos con servicios de precio cero o negativo.
+
+Casos definidos:
+- Un servicio con precio cero debe rechazarse.
+- Un servicio con precio negativo debe rechazarse.
+
+GREEN:
+Se uso la validacion existente dentro de `calcular_subtotal(precios)` para lanzar `ValueError` cuando algun precio no sea mayor a cero.
+
+Codigo trabajado:
+- `calcular_subtotal(precios)`
+
+REFACTOR:
+La validacion quedo en la misma funcion porque el subtotal es el primer punto donde se revisan los precios del pago.

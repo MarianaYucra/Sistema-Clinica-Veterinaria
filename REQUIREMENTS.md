@@ -1,70 +1,199 @@
-# REQUIREMENTS — Sistema de Gestión de Clínica Veterinaria
+# REQUIREMENTS
 
-## Descripción general
-MVP (Producto Mínimo Viable) de un sistema web para clínica veterinaria desarrollado en Python y Flask. El sistema permite registrar clientes (dueños) y mascotas (pacientes), gestionar el ciclo completo de una cita médica (programada → en atención → finalizada) y generar recetas médicas/comprobantes automáticos en formato PDF con impuestos y un código QR único de validación.
-
----
-
-## Requisitos Funcionales
-
-### RF-01 — Gestión de Clientes (Dueños)
-* El sistema debe permitir registrar un cliente con: DNI, nombre, apellido, teléfono y email.
-* El DNI debe ser una cadena válida (no vacía, no nula, ni compuesta solo por espacios).
-* El email debe ser un correo válido y contener obligatoriamente el carácter `@`.
-* No se permiten dos clientes con el mismo número de DNI en el sistema.
-* El sistema debe permitir buscar y recuperar los datos de un cliente mediante su DNI.
-
-### RF-02 — Gestión de Mascotas (Pacientes)
-* El sistema debe permitir registrar mascotas asociadas a un cliente con: ID de mascota, nombre, especie (ej. CANINO, FELINO), edad y peso.
-* La edad de la mascota debe ser un número entero mayor o igual a cero ($\ge 0$).
-* El peso de la mascota en kilogramos debe ser un valor estrictamente positivo ($> 0$).
-* Cada mascota tendrá un identificador único. El sistema debe permitir listar todas las mascotas de un cliente específico.
-
-### RF-03 — Gestión de Citas Médicas
-* El sistema debe permitir crear una cita médica vinculando a un cliente, una mascota y un veterinario disponible, asignando fecha y hora.
-* La fecha de la cita debe ser programada para el día actual o una fecha futura.
-* Una cita puede crearse inicialmente en estado: `PROGRAMADA`.
-* El sistema calcula automáticamente el costo base de la consulta médica según la especialidad del veterinario asignado.
-* Una cita puede ser cancelada; al hacerlo, el estado de la cita cambia a `CANCELADA` y se libera el horario del veterinario.
-
-### RF-04 — Inicio de Atención (Check-in de Cita)
-* El sistema debe permitir iniciar la consulta médica únicamente si la cita está en estado `PROGRAMADA`.
-* Al iniciar la atención, el estado de la cita pasa a `EN_ATENCION`.
-* No se puede iniciar la atención de una cita que ya fue cancelada, finalizada o que ya se encuentra activa.
-
-### RF-05 — Cierre de Consulta y Facturación
-* El sistema debe permitir finalizar la consulta de una cita que se encuentre en estado `EN_ATENCION`.
-* Al finalizar la atención, el estado de la cita pasa a `FINALIZADA`.
-* El sistema genera automáticamente un reporte/receta médica en formato PDF que incluye un código QR único con los datos del paciente.
-* Al mismo tiempo, se genera un comprobante electrónico con un número correlativo, subtotal, impuesto (IGV 18%) y el costo total a pagar.
-* No se puede emitir el PDF ni el comprobante de pago de una cita que no haya concluido con éxito (`FINALIZADA`).
+Guía de instalación detallada para desplegar el proyecto en Linux, Windows y macOS.
 
 ---
 
-## Reglas de Negocio
+## Dependencias
 
-| ID Regla | Descripción de la Regla |
-| :--- | :--- |
-| **RN-01** | El DNI del cliente debe ser obligatorio, no nulo y no vacío. |
-| **RN-02** | El formato de email del cliente debe contener obligatoriamente el carácter `@`. |
-| **RN-03** | La edad de la mascota debe ser un valor numérico entero $\ge 0$. |
-| **RN-04** | El peso de la mascota debe ser un valor de punto flotante $> 0.0$. |
-| **RN-05** | La fecha de una nueva cita programada debe ser $\ge$ a la fecha actual. |
-| **RN-06** | Una cita solo puede iniciar atención si su estado actual es `PROGRAMADA`. |
-| **RN-07** | Una consulta solo puede finalizarse si su estado actual es `EN_ATENCION`. |
-| **RN-08** | El reporte médico digital (PDF) solo se emite sobre citas en estado `FINALIZADA`. |
-| **RN-09** | La tasa fija del Impuesto General a las Ventas (IGV) es igual al 18% del subtotal. |
-| **RN-10** | El Costo Total de la atención es equivalente a: $\text{Subtotal} + \text{IGV}$. |
+| Herramienta | Versión mínima |  
+|-------------|---------------|
+| Python      | 3.10+         |
+| Pytest      | 8.0.0+        |
+| Coverage.py | latest        |
+
+> No se requieren dependencias adicionales más allá de la biblioteca estándar de Python.
 
 ---
 
-### 1. Partición de Equivalencia (PE)
+## Linux
 
-| Campo / Flujo | Clase Válida | Clase Inválida |
-| :--- | :--- | :--- |
-| **DNI Cliente** | Cadena de texto con caracteres válidos | Objeto nulo (`None`), cadena vacía (`""`), solo espacios (`"   "`) |
-| **Email** | Cadena que incluye el carácter `@` | Cadena sin `@`, texto vacío, nulo |
-| **Edad Mascota** | Número entero $\ge 0$ | Números negativos (ej. `-1`, `-5`) |
-| **Peso Mascota** | Número decimal (float) $> 0.0$ | Valor igual a `0.0`, valores negativos |
-| **Estado para Inicio** | Cita en estado `PROGRAMADA` | Estados `EN_ATENCION`, `CANCELADA`, `FINALIZADA` |
-| **Estado para Cierre** | Cita en estado `EN_ATENCION` | Estados `PROGRAMADA`, `CANCELADA`, `FINALIZADA` |
+### 1. Instalar Python 3.10+
+
+```bash
+# Ubuntu / Debian
+sudo apt update
+sudo apt install python3 python3-pip python3-venv -y
+
+# Fedora
+sudo dnf install python3 python3-pip -y
+
+# Arch Linux
+sudo pacman -S python python-pip
+```
+
+Verifica:
+
+```bash
+python3 --version
+```
+
+### 2. Clonar el repositorio
+
+```bash
+git clone https://github.com/MarianaYucra/Sistema-Clinica-Veterinaria.git
+cd Sistema-Clinica-Veterinaria
+```
+
+### 3. Crear y activar el entorno virtual
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 4. Instalar dependencias
+
+```bash
+pip install pytest coverage
+```
+
+### 5. Ejecutar el sistema
+
+```bash
+python3 app/main.py
+```
+
+### 6. Ejecutar las pruebas
+
+```bash
+pytest -v
+```
+
+---
+
+## Windows
+
+### 1. Instalar Python 3.10+
+
+Descarga el instalador desde [https://www.python.org/downloads/](https://www.python.org/downloads/).
+
+> **Importante:** Durante la instalación marca **"Add Python to PATH"** antes de continuar.
+
+Verifica desde PowerShell:
+
+```powershell
+python --version
+```
+
+### 2. Instalar Git (si no lo tienes)
+
+Descárgalo desde [https://git-scm.com/](https://git-scm.com/) e instálalo con las opciones por defecto.
+
+### 3. Clonar el repositorio
+
+```powershell
+git clone https://github.com/MarianaYucra/Sistema-Clinica-Veterinaria.git
+cd Sistema-Clinica-Veterinaria
+```
+
+### 4. Crear y activar el entorno virtual
+
+```powershell
+python -m venv venv
+venv\Scripts\activate
+```
+
+> Si ves un error de permisos, ejecuta primero:
+> ```powershell
+> Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+> ```
+
+### 5. Instalar dependencias
+
+```powershell
+pip install pytest coverage
+```
+
+### 6. Ejecutar el sistema
+
+```powershell
+python app/main.py
+```
+
+### 7. Ejecutar las pruebas
+
+```powershell
+pytest -v
+```
+
+---
+
+## macOS
+
+### 1. Instalar Python 3.10+
+
+```bash
+# Instalar Homebrew (si no lo tienes)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Instalar Python
+brew install python
+```
+
+Verifica:
+
+```bash
+python3 --version
+```
+
+### 2. Clonar el repositorio
+
+```bash
+git clone https://github.com/MarianaYucra/Sistema-Clinica-Veterinaria.git
+cd Sistema-Clinica-Veterinaria
+```
+
+### 3. Crear y activar el entorno virtual
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 4. Instalar dependencias
+
+```bash
+pip install pytest coverage
+```
+
+### 5. Ejecutar el sistema
+
+```bash
+python3 app/main.py
+```
+
+### 6. Ejecutar las pruebas
+
+```bash
+pytest -v
+```
+
+---
+
+## Notas generales
+
+- Usa siempre un **entorno virtual** para aislar las dependencias del proyecto.
+- Para desactivar el entorno virtual en cualquier sistema:
+  ```bash
+  deactivate
+  ```
+- Si `pytest` no se reconoce como comando, prueba:
+  ```bash
+  python -m pytest -v
+  ```
+- Para medir cobertura de pruebas:
+  ```bash
+  coverage run -m pytest
+  coverage report
+  ```

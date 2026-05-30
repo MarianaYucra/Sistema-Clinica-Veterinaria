@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Clientes — VetClinic{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Clientes</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2><i class="bi bi-people-fill me-2 text-primary"></i>Clientes</h2>
+  <a href="{{ url_for('nuevo_cliente') }}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Nuevo Cliente
+  </a>
+</div>
+
+<!-- Search -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="GET" class="row g-2 align-items-center">
+      <div class="col-auto flex-grow-1">
+        <div class="input-group input-group-sm">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="text" name="q" class="form-control" placeholder="Buscar por nombre o ID..." value="{{ q }}">
+        </div>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-sm btn-primary">Buscar</button>
+        {% if q %}
+          <a href="{{ url_for('listar_clientes') }}" class="btn btn-sm btn-outline-secondary">Limpiar</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+  <div class="card-body p-0">
+    {% if clientes %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>ID / DNI</th>
+              <th>Nombre</th>
+              <th>Teléfono</th>
+              <th>Email</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in clientes %}
+            <tr>
+              <td><span class="badge bg-light text-dark font-monospace">{{ c.id_cliente }}</span></td>
+              <td class="fw-semibold">{{ c.nombre }}</td>
+              <td>{{ c.telefono }}</td>
+              <td>{{ c.email }}</td>
+              <td class="text-end">
+                <a href="{{ url_for('detalle_cliente', id_cliente=c.id_cliente) }}" class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="bi bi-people d-block"></i>
+        <p>{% if q %}No se encontraron clientes para "{{ q }}"{% else %}No hay clientes registrados{% endif %}</p>
+        <a href="{{ url_for('nuevo_cliente') }}" class="btn btn-sm btn-primary">
+          <i class="bi bi-plus-lg me-1"></i>Registrar Cliente
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

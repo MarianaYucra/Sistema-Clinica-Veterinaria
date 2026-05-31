@@ -4,6 +4,7 @@ from app.repository import (
     MascotaRepository,
     RegistroClinicoRepository,
     VeterinarioRepository,
+    obtener_ruta_base_datos,
 )
 from app.services import (
     AtencionService,
@@ -11,6 +12,13 @@ from app.services import (
     ClienteService,
     MascotaService,
     VeterinarioService,
+    validar_dni_cliente,
+    validar_email_cliente,
+    validar_especialidad_veterinario,
+    validar_id_veterinario,
+    validar_nombre_cliente,
+    validar_nombre_veterinario,
+    validar_telefono_cliente,
 )
 
 SEPARADOR = "=" * 50
@@ -51,6 +59,20 @@ def leer_flotante(mensaje: str) -> float:
             return float(input(mensaje))
         except ValueError:
             print("Error: Ingrese un número válido.")
+
+
+def leer_campo_validado(mensaje: str, validador):
+    while True:
+        try:
+            return validador(input(mensaje))
+        except ValueError as e:
+            print(str(e))
+
+
+def validar_criterio_busqueda(valor: str) -> str:
+    if valor is None or not valor.strip():
+        raise ValueError("El dato de busqueda no puede estar vacio.")
+    return valor.strip()
 
 
 def validar_descuento(descuento: float):
@@ -116,22 +138,27 @@ def registrar_pago_atencion():
 
 def registrar_cliente(servicio: ClienteService):
     print("\n--- Registrar Cliente ---")
-    id_cliente = input("Cédula/DNI: ")
-    nombre = input("Nombre: ")
-    telefono = input("Teléfono: ")
-    email = input("Email: ")
-    try:
-        cliente = servicio.registrar(id_cliente, nombre, telefono, email)
-        print(f"Cliente '{cliente.nombre}' registrado exitosamente.")
-    except ValueError as e:
-        print(f"Error: {e}")
+    while True:
+        id_cliente = leer_campo_validado("Cédula/DNI: ", validar_dni_cliente)
+        nombre = leer_campo_validado("Nombre: ", validar_nombre_cliente)
+        telefono = leer_campo_validado("Teléfono: ", validar_telefono_cliente)
+        email = leer_campo_validado("Email: ", validar_email_cliente)
+        try:
+            cliente = servicio.registrar(id_cliente, nombre, telefono, email)
+            print(f"Cliente '{cliente.nombre}' registrado exitosamente.")
+            return
+        except ValueError as e:
+            print(str(e))
+            print("Vuelva a ingresar los datos del cliente.")
 
 
 def buscar_cliente(servicio: ClienteService):
     print("\n--- Buscar Cliente ---")
-    id_cliente = input("Cédula/DNI a buscar: ")
+    criterio = leer_campo_validado(
+        "DNI, nombre o email a buscar: ", validar_criterio_busqueda
+    )
     try:
-        c = servicio.buscar(id_cliente)
+        c = servicio.buscar(criterio)
         print(f"  ID: {c.id_cliente}")
         print(f"  Nombre: {c.nombre}")
         print(f"  Teléfono: {c.telefono}")
@@ -152,26 +179,35 @@ def listar_clientes(servicio: ClienteService):
 
 def registrar_veterinario(servicio: VeterinarioService):
     print("\n--- Registrar Veterinario ---")
-    id_vet = input("ID Veterinario: ")
-    nombre = input("Nombre: ")
-    especialidad = input("Especialidad: ")
-    try:
-        vet = servicio.registrar(id_vet, nombre, especialidad)
-        print(f"Veterinario '{vet.nombre}' registrado exitosamente.")
-    except ValueError as e:
-        print(f"Error: {e}")
+    while True:
+        id_vet = leer_campo_validado("ID Veterinario: ", validar_id_veterinario)
+        nombre = leer_campo_validado("Nombre: ", validar_nombre_veterinario)
+        especialidad = leer_campo_validado(
+            "Especialidad: ", validar_especialidad_veterinario
+        )
+        try:
+            vet = servicio.registrar(id_vet, nombre, especialidad)
+            print(f"Veterinario '{vet.nombre}' registrado exitosamente.")
+            return
+        except ValueError as e:
+            print(str(e))
+            print("Vuelva a ingresar los datos del veterinario.")
 
 
 def buscar_veterinario(servicio: VeterinarioService):
     print("\n--- Buscar Veterinario ---")
-    id_vet = input("ID Veterinario a buscar: ")
+    criterio = leer_campo_validado(
+        "ID, nombre o especialidad a buscar: ", validar_criterio_busqueda
+    )
     try:
-        v = servicio.buscar(id_vet)
-        print(f"  ID: {v.id_veterinario}")
-        print(f"  Nombre: {v.nombre}")
-        print(f"  Especialidad: {v.especialidad}")
+        resultado = servicio.buscar(criterio)
+        veterinarios = resultado if isinstance(resultado, list) else [resultado]
+        for v in veterinarios:
+            print(f"  ID: {v.id_veterinario}")
+            print(f"  Nombre: {v.nombre}")
+            print(f"  Especialidad: {v.especialidad}")
     except ValueError as e:
-        print(f"Error: {e}")
+        print(str(e))
 
 
 def listar_veterinarios(servicio: VeterinarioService):
@@ -199,7 +235,7 @@ def registrar_mascota(servicio: MascotaService):
             f"ID {mascota.id_mascota}."
         )
     except ValueError as e:
-        print(f"Error: {e}")
+        print(str(e))
 
 
 def buscar_mascota(servicio: MascotaService):
@@ -306,11 +342,12 @@ def ver_historial(
 
 
 def main():
-    cliente_repo = ClienteRepository()
-    veterinario_repo = VeterinarioRepository()
-    mascota_repo = MascotaRepository()
-    cita_repo = CitaRepository()
-    registro_repo = RegistroClinicoRepository()
+    db_path = obtener_ruta_base_datos()
+    cliente_repo = ClienteRepository(db_path)
+    veterinario_repo = VeterinarioRepository(db_path)
+    mascota_repo = MascotaRepository(db_path)
+    cita_repo = CitaRepository(db_path)
+    registro_repo = RegistroClinicoRepository(db_path)
 
     cliente_svc = ClienteService(cliente_repo)
     veterinario_svc = VeterinarioService(veterinario_repo)

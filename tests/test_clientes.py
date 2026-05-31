@@ -24,6 +24,7 @@ def test_registrar_cliente_exitoso(cliente_entorno):
         ("1234567A", "Juan Perez", "987654321", "juan@mail.com"),
         ("12345678", "", "987654321", "juan@mail.com"),
         ("12345678", "   ", "987654321", "juan@mail.com"),
+        ("12345678", "An", "987654321", "juan@mail.com"),
         ("12345678", "Juan 123", "987654321", "juan@mail.com"),
         ("12345678", "Juan Perez", "", "juan@mail.com"),
         ("12345678", "Juan Perez", "987ABC321", "juan@mail.com"),

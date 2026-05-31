@@ -22,10 +22,12 @@ def test_registrar_veterinario_exitoso(veterinario_entorno):
         ("VET-001", "Dr. Perez", "Cardiologia"),
         ("VET001", "", "Cardiologia"),
         ("VET001", "   ", "Cardiologia"),
+        ("VET001", "Dr.", "Cardiologia"),
         ("VET001", "Dr. Perez 123", "Cardiologia"),
         ("VET001", "Dr. @Perez", "Cardiologia"),
         ("VET001", "Dr. Perez", ""),
         ("VET001", "Dr. Perez", "   "),
+        ("VET001", "Dr. Perez", "Ojo"),
         ("VET001", "Dr. Perez", "Cardiologia 123"),
         ("VET001", "Dr. Perez", "Cardiologia!"),
     ],
@@ -79,7 +81,19 @@ def test_buscar_veterinario_existente(veterinario_entorno):
     assert svc.buscar("VET001").nombre == "Dr. Perez"
     assert svc.buscar("vet001").nombre == "Dr. Perez"
     assert svc.buscar("Dr. Perez").id_veterinario == "VET001"
-    assert svc.buscar("Cardiologia").id_veterinario == "VET001"
+
+
+def test_buscar_veterinario_por_especialidad_devuelve_coincidencias(
+    veterinario_entorno,
+):
+    _, svc = veterinario_entorno
+    svc.registrar("VET001", "Dr. Perez", "Cardiologia")
+    svc.registrar("VET002", "Dra. Gomez", "Cardiologia")
+    svc.registrar("VET003", "Dr. Ruiz", "Dermatologia")
+
+    resultado = svc.buscar("cardio")
+
+    assert [vet.id_veterinario for vet in resultado] == ["VET001", "VET002"]
 
 
 def test_buscar_veterinario_no_existente(veterinario_entorno):

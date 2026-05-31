@@ -1,5 +1,5 @@
 import re
-from typing import List
+from typing import List, Union
 
 from app.models import (
     Cita,
@@ -36,6 +36,12 @@ def _validar_solo_letras_espacios(valor: str, campo: str) -> None:
         raise ValueError(f"{campo} solo debe contener letras y espacios.")
 
 
+def _validar_minimo_letras(valor: str, campo: str, minimo: int) -> None:
+    total_letras = sum(1 for caracter in valor if caracter.isalpha())
+    if total_letras <= minimo:
+        raise ValueError(f"{campo} debe tener mas de {minimo} letras.")
+
+
 def _validar_nombre_veterinario(valor: str) -> None:
     caracteres_validos = (
         caracter.isalpha() or caracter.isspace() or caracter == "."
@@ -47,6 +53,71 @@ def _validar_nombre_veterinario(valor: str) -> None:
         )
     if not any(caracter.isalpha() for caracter in valor):
         raise ValueError("El nombre del veterinario debe contener letras.")
+    _validar_minimo_letras(valor, "El nombre del veterinario", 2)
+
+
+def validar_dni_cliente(valor: str) -> str:
+    dni = _texto_obligatorio(valor, "El DNI del cliente")
+    if not dni.isdigit():
+        raise ValueError("El DNI del cliente solo debe contener numeros.")
+    if not 8 <= len(dni) <= 12:
+        raise ValueError("El DNI del cliente debe tener entre 8 y 12 digitos.")
+    return dni
+
+
+def validar_nombre_cliente(valor: str) -> str:
+    nombre = _texto_obligatorio(valor, "El nombre del cliente")
+    _validar_solo_letras_espacios(nombre, "El nombre del cliente")
+    _validar_minimo_letras(nombre, "El nombre del cliente", 2)
+    return nombre
+
+
+def validar_telefono_cliente(valor: str) -> str:
+    telefono = _texto_obligatorio(valor, "El telefono del cliente")
+    if not telefono.isdigit():
+        raise ValueError("El telefono del cliente solo debe contener numeros.")
+    if not 7 <= len(telefono) <= 15:
+        raise ValueError(
+            "El telefono del cliente debe tener entre 7 y 15 digitos."
+        )
+    return telefono
+
+
+def validar_email_cliente(valor: str) -> str:
+    email = _texto_obligatorio(valor, "El correo del cliente")
+    if not EMAIL_REGEX.fullmatch(email):
+        raise ValueError("El correo del cliente no tiene un formato valido.")
+    return email
+
+
+def validar_id_veterinario(valor: str) -> str:
+    id_veterinario = _texto_obligatorio(
+        valor, "El ID del veterinario"
+    ).upper()
+    if not CODIGO_VETERINARIO_REGEX.fullmatch(id_veterinario):
+        raise ValueError(
+            "El ID del veterinario debe tener letras seguidas de 3 a 6 numeros."
+        )
+    return id_veterinario
+
+
+def validar_nombre_veterinario(valor: str) -> str:
+    nombre = _texto_obligatorio(valor, "El nombre del veterinario")
+    _validar_nombre_veterinario(nombre)
+    return nombre
+
+
+def validar_especialidad_veterinario(valor: str) -> str:
+    especialidad = _texto_obligatorio(
+        valor, "La especialidad del veterinario"
+    )
+    _validar_solo_letras_espacios(
+        especialidad, "La especialidad del veterinario"
+    )
+    _validar_minimo_letras(
+        especialidad, "La especialidad del veterinario", 3
+    )
+    return especialidad
 
 
 class ClienteService:
@@ -56,30 +127,15 @@ class ClienteService:
     def registrar(
         self, id_cliente: str, nombre: str, telefono: str, email: str
     ) -> Cliente:
-        id_cliente = _texto_obligatorio(id_cliente, "El DNI del cliente")
-        nombre = _texto_obligatorio(nombre, "El nombre del cliente")
-        telefono = _texto_obligatorio(telefono, "El telefono del cliente")
-        email = _texto_obligatorio(email, "El correo del cliente")
+        id_cliente = validar_dni_cliente(id_cliente)
+        nombre = validar_nombre_cliente(nombre)
+        telefono = validar_telefono_cliente(telefono)
+        email = validar_email_cliente(email)
 
-        if not id_cliente.isdigit():
-            raise ValueError("El DNI del cliente solo debe contener numeros.")
-        if not 8 <= len(id_cliente) <= 12:
-            raise ValueError("El DNI del cliente debe tener entre 8 y 12 digitos.")
         if self._repo.existe(id_cliente):
             raise ValueError(
                 f"Ya existe un cliente con ID '{id_cliente}'."
             )
-        _validar_solo_letras_espacios(nombre, "El nombre del cliente")
-
-        if not telefono.isdigit():
-            raise ValueError("El telefono del cliente solo debe contener numeros.")
-        if not 7 <= len(telefono) <= 15:
-            raise ValueError(
-                "El telefono del cliente debe tener entre 7 y 15 digitos."
-            )
-
-        if not EMAIL_REGEX.fullmatch(email):
-            raise ValueError("El correo del cliente no tiene un formato valido.")
         if any(
             cliente.email.lower() == email.lower()
             for cliente in self._repo.listar()
@@ -121,26 +177,14 @@ class VeterinarioService:
     def registrar(
         self, id_veterinario: str, nombre: str, especialidad: str
     ) -> Veterinario:
-        id_veterinario = _texto_obligatorio(
-            id_veterinario, "El ID del veterinario"
-        ).upper()
-        nombre = _texto_obligatorio(nombre, "El nombre del veterinario")
-        especialidad = _texto_obligatorio(
-            especialidad, "La especialidad del veterinario"
-        )
+        id_veterinario = validar_id_veterinario(id_veterinario)
+        nombre = validar_nombre_veterinario(nombre)
+        especialidad = validar_especialidad_veterinario(especialidad)
 
-        if not CODIGO_VETERINARIO_REGEX.fullmatch(id_veterinario):
-            raise ValueError(
-                "El ID del veterinario debe tener letras seguidas de 3 a 6 numeros."
-            )
         if self._repo.existe(id_veterinario):
             raise ValueError(
                 f"Ya existe un veterinario con ID '{id_veterinario}'."
             )
-        _validar_nombre_veterinario(nombre)
-        _validar_solo_letras_espacios(
-            especialidad, "La especialidad del veterinario"
-        )
 
         veterinario = Veterinario(
             id_veterinario=id_veterinario,
@@ -150,7 +194,7 @@ class VeterinarioService:
         self._repo.guardar(veterinario)
         return veterinario
 
-    def buscar(self, criterio: str) -> Veterinario:
+    def buscar(self, criterio: str) -> Union[Veterinario, List[Veterinario]]:
         criterio = _texto_obligatorio(
             criterio, "El dato de busqueda del veterinario"
         )
@@ -158,8 +202,9 @@ class VeterinarioService:
         if veterinario is None:
             veterinario = self._repo.buscar_por_nombre(criterio)
         if veterinario is None:
-            veterinario = self._repo.buscar_por_especialidad(criterio)
-        if veterinario is None:
+            veterinarios = self._repo.buscar_por_especialidad(criterio)
+            if veterinarios:
+                return veterinarios
             raise ValueError(
                 f"No se encontro un veterinario con el dato '{criterio}'."
             )
@@ -312,6 +357,7 @@ class AtencionService:
             raise ValueError("El tratamiento no puede estar vacío.")
 
         cita.estado = "Completada"
+        self._cita_repo.actualizar_estado(id_cita, cita.estado)
 
         registro = RegistroClinico(
             id_registro=0,

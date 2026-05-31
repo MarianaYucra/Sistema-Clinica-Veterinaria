@@ -2,7 +2,7 @@
 
 Sistema de gestion para una clinica veterinaria. El proyecto conserva una interfaz de consola y agrega una aplicacion web con Flask.
 
-Los datos se almacenan en memoria mediante repositorios con diccionarios. Al reiniciar la aplicacion se pierden los clientes, mascotas, veterinarios, citas y registros creados durante la sesion.
+En la ejecucion por consola, los datos se almacenan en una base de datos SQLite local en `data/clinica.db`. El archivo se crea automaticamente al iniciar el sistema.
 
 ## Funcionalidades
 

@@ -25,6 +25,10 @@ build/
 .coverage
 htmlcov/
 
+# Local database
+data/*.db
+data/*.sqlite
+
 # OS
 .DS_Store
 Thumbs.db

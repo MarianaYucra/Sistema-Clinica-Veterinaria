@@ -19,6 +19,7 @@ from app.repository import (
 EMAIL_REGEX = re.compile(
     r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
 )
+CODIGO_VETERINARIO_REGEX = re.compile(r"^[A-Za-z]{1,5}[0-9]{3,6}$")
 
 
 def _texto_obligatorio(valor, campo: str) -> str:
@@ -33,6 +34,19 @@ def _texto_obligatorio(valor, campo: str) -> str:
 def _validar_solo_letras_espacios(valor: str, campo: str) -> None:
     if not all(caracter.isalpha() or caracter.isspace() for caracter in valor):
         raise ValueError(f"{campo} solo debe contener letras y espacios.")
+
+
+def _validar_nombre_veterinario(valor: str) -> None:
+    caracteres_validos = (
+        caracter.isalpha() or caracter.isspace() or caracter == "."
+        for caracter in valor
+    )
+    if not all(caracteres_validos):
+        raise ValueError(
+            "El nombre del veterinario solo debe contener letras, espacios y puntos."
+        )
+    if not any(caracter.isalpha() for caracter in valor):
+        raise ValueError("El nombre del veterinario debe contener letras.")
 
 
 class ClienteService:
@@ -83,14 +97,16 @@ class ClienteService:
         self._repo.guardar(cliente)
         return cliente
 
-    def buscar(self, id_cliente: str) -> Cliente:
-        id_cliente = _texto_obligatorio(id_cliente, "El DNI del cliente")
-        if not id_cliente.isdigit():
-            raise ValueError("El DNI del cliente solo debe contener numeros.")
-        cliente = self._repo.buscar(id_cliente)
+    def buscar(self, criterio: str) -> Cliente:
+        criterio = _texto_obligatorio(criterio, "El dato de busqueda del cliente")
+        cliente = self._repo.buscar(criterio)
+        if cliente is None and EMAIL_REGEX.fullmatch(criterio):
+            cliente = self._repo.buscar_por_email(criterio)
+        if cliente is None:
+            cliente = self._repo.buscar_por_nombre(criterio)
         if cliente is None:
             raise ValueError(
-                f"No se encontro un cliente con ID '{id_cliente}'."
+                f"No se encontro un cliente con el dato '{criterio}'."
             )
         return cliente
 
@@ -105,29 +121,47 @@ class VeterinarioService:
     def registrar(
         self, id_veterinario: str, nombre: str, especialidad: str
     ) -> Veterinario:
-        if not id_veterinario or not id_veterinario.strip():
-            raise ValueError("El ID del veterinario no puede estar vacío.")
+        id_veterinario = _texto_obligatorio(
+            id_veterinario, "El ID del veterinario"
+        ).upper()
+        nombre = _texto_obligatorio(nombre, "El nombre del veterinario")
+        especialidad = _texto_obligatorio(
+            especialidad, "La especialidad del veterinario"
+        )
+
+        if not CODIGO_VETERINARIO_REGEX.fullmatch(id_veterinario):
+            raise ValueError(
+                "El ID del veterinario debe tener letras seguidas de 3 a 6 numeros."
+            )
         if self._repo.existe(id_veterinario):
             raise ValueError(
                 f"Ya existe un veterinario con ID '{id_veterinario}'."
             )
-        if not nombre or not nombre.strip():
-            raise ValueError(
-                "El nombre del veterinario no puede estar vacío."
-            )
+        _validar_nombre_veterinario(nombre)
+        _validar_solo_letras_espacios(
+            especialidad, "La especialidad del veterinario"
+        )
+
         veterinario = Veterinario(
-            id_veterinario=id_veterinario.strip(),
-            nombre=nombre.strip(),
-            especialidad=especialidad.strip(),
+            id_veterinario=id_veterinario,
+            nombre=nombre,
+            especialidad=especialidad,
         )
         self._repo.guardar(veterinario)
         return veterinario
 
-    def buscar(self, id_veterinario: str) -> Veterinario:
-        veterinario = self._repo.buscar(id_veterinario)
+    def buscar(self, criterio: str) -> Veterinario:
+        criterio = _texto_obligatorio(
+            criterio, "El dato de busqueda del veterinario"
+        )
+        veterinario = self._repo.buscar(criterio.upper())
+        if veterinario is None:
+            veterinario = self._repo.buscar_por_nombre(criterio)
+        if veterinario is None:
+            veterinario = self._repo.buscar_por_especialidad(criterio)
         if veterinario is None:
             raise ValueError(
-                f"No se encontró un veterinario con ID '{id_veterinario}'."
+                f"No se encontro un veterinario con el dato '{criterio}'."
             )
         return veterinario
 

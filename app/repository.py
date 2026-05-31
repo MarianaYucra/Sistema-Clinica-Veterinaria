@@ -19,6 +19,20 @@ class ClienteRepository:
     def buscar(self, id_cliente: str) -> Optional[Cliente]:
         return self._storage.get(id_cliente)
 
+    def buscar_por_nombre(self, nombre: str) -> Optional[Cliente]:
+        nombre_normalizado = nombre.strip().lower()
+        for cliente in self._storage.values():
+            if cliente.nombre.lower() == nombre_normalizado:
+                return cliente
+        return None
+
+    def buscar_por_email(self, email: str) -> Optional[Cliente]:
+        email_normalizado = email.strip().lower()
+        for cliente in self._storage.values():
+            if cliente.email.lower() == email_normalizado:
+                return cliente
+        return None
+
     def listar(self) -> List[Cliente]:
         return list(self._storage.values())
 
@@ -35,6 +49,20 @@ class VeterinarioRepository:
 
     def buscar(self, id_veterinario: str) -> Optional[Veterinario]:
         return self._storage.get(id_veterinario)
+
+    def buscar_por_nombre(self, nombre: str) -> Optional[Veterinario]:
+        nombre_normalizado = nombre.strip().lower()
+        for veterinario in self._storage.values():
+            if veterinario.nombre.lower() == nombre_normalizado:
+                return veterinario
+        return None
+
+    def buscar_por_especialidad(self, especialidad: str) -> Optional[Veterinario]:
+        especialidad_normalizada = especialidad.strip().lower()
+        for veterinario in self._storage.values():
+            if veterinario.especialidad.lower() == especialidad_normalizada:
+                return veterinario
+        return None
 
     def listar(self) -> List[Veterinario]:
         return list(self._storage.values())

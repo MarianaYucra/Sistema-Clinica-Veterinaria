@@ -62,6 +62,8 @@ def test_buscar_cliente_existente_y_no_existente(cliente_entorno):
     svc.registrar("12345678", "Juan Perez", "987654321", "juan@mail.com")
 
     assert svc.buscar("12345678").nombre == "Juan Perez"
+    assert svc.buscar("Juan Perez").id_cliente == "12345678"
+    assert svc.buscar("JUAN@mail.com").id_cliente == "12345678"
     with pytest.raises(ValueError, match="No se encontro un cliente"):
         svc.buscar("99999999")
 

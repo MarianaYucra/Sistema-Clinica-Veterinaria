@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, flash, redirect, render_template, url_for
+from flask import Flask, flash, redirect, render_template, request, url_for
 
 from app.repository import (
     CitaRepository,
@@ -65,12 +65,64 @@ def _placeholder():
 
 @app.route("/clientes")
 def listar_clientes():
-    return _placeholder()
+    q = request.args.get("q", "").strip()
+    clientes = cliente_service.listar()
+
+    if q:
+        q_lower = q.lower()
+        clientes = [
+            cliente
+            for cliente in clientes
+            if q_lower in cliente.id_cliente.lower()
+            or q_lower in cliente.nombre.lower()
+        ]
+
+    return render_template(
+        "clientes/lista.html",
+        clientes=clientes,
+        q=q,
+    )
 
 
-@app.route("/clientes/nuevo")
+@app.route("/clientes/nuevo", methods=["GET", "POST"])
 def nuevo_cliente():
-    return _placeholder()
+    if request.method == "POST":
+        try:
+            cliente = cliente_service.registrar(
+                request.form.get("id_cliente", ""),
+                request.form.get("nombre", ""),
+                request.form.get("telefono", ""),
+                request.form.get("email", ""),
+            )
+            flash(f"Cliente '{cliente.nombre}' registrado correctamente.", "success")
+            return redirect(
+                url_for("detalle_cliente", id_cliente=cliente.id_cliente)
+            )
+        except ValueError as exc:
+            flash(str(exc), "error")
+
+    return render_template("clientes/formulario.html")
+
+
+@app.route("/clientes/<id_cliente>")
+def detalle_cliente(id_cliente):
+    try:
+        cliente = cliente_service.buscar(id_cliente)
+    except ValueError as exc:
+        flash(str(exc), "error")
+        return redirect(url_for("listar_clientes"))
+
+    mascotas = [
+        mascota
+        for mascota in mascota_service.listar()
+        if mascota.id_cliente == id_cliente
+    ]
+
+    return render_template(
+        "clientes/detalle.html",
+        cliente=cliente,
+        mascotas=mascotas,
+    )
 
 
 @app.route("/veterinarios")
@@ -90,6 +142,11 @@ def listar_mascotas():
 
 @app.route("/mascotas/nueva")
 def nueva_mascota():
+    return _placeholder()
+
+
+@app.route("/mascotas/<int:id_mascota>")
+def detalle_mascota(id_mascota):
     return _placeholder()
 
 

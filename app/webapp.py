@@ -2,7 +2,7 @@ import os
 
 from flask import Flask, flash, redirect, render_template, request, url_for
 
-from app.main import calcular_subtotal, calcular_total, aplicar_descuento
+from app.main import aplicar_descuento, calcular_subtotal, calcular_total
 from app.repository import (
     CitaRepository,
     ClienteRepository,
@@ -35,6 +35,31 @@ cita_service = CitaService(cita_repo, mascota_repo, veterinario_repo)
 atencion_service = AtencionService(cita_repo, registro_repo)
 
 
+def _form_int(nombre_campo, mensaje_error):
+    try:
+        return int(request.form.get(nombre_campo, "0"))
+    except ValueError as exc:
+        raise ValueError(mensaje_error) from exc
+
+
+def _form_float(nombre_campo, mensaje_error):
+    try:
+        return float(request.form.get(nombre_campo, "0"))
+    except ValueError as exc:
+        raise ValueError(mensaje_error) from exc
+
+
+def _parse_precios(texto):
+    try:
+        return [
+            float(valor.strip())
+            for valor in texto.replace(",", "\n").splitlines()
+            if valor.strip()
+        ]
+    except ValueError as exc:
+        raise ValueError("Ingrese precios validos.") from exc
+
+
 @app.route("/")
 def dashboard():
     clientes = cliente_service.listar()
@@ -57,11 +82,6 @@ def dashboard():
         stats=stats,
         citas_programadas=citas_programadas,
     )
-
-
-def _placeholder():
-    flash("Modulo pendiente de implementar en la siguiente parte.", "info")
-    return redirect(url_for("dashboard"))
 
 
 @app.route("/clientes")
@@ -225,12 +245,14 @@ def nueva_mascota():
 
     if request.method == "POST":
         try:
+            edad = _form_int("edad", "La edad debe ser un numero entero.")
+            peso = _form_float("peso", "El peso debe ser un numero valido.")
             mascota = mascota_service.registrar(
                 request.form.get("nombre", ""),
                 request.form.get("especie", ""),
                 request.form.get("raza", ""),
-                int(request.form.get("edad", "0")),
-                float(request.form.get("peso", "0")),
+                edad,
+                peso,
                 request.form.get("id_cliente", ""),
             )
             flash(f"Mascota '{mascota.nombre}' registrada correctamente.", "success")
@@ -296,10 +318,14 @@ def nueva_cita():
 
     if request.method == "POST":
         try:
+            id_mascota = _form_int(
+                "id_mascota",
+                "Seleccione una mascota valida.",
+            )
             cita = cita_service.agendar(
                 request.form.get("fecha", ""),
                 request.form.get("hora", ""),
-                int(request.form.get("id_mascota", "0")),
+                id_mascota,
                 request.form.get("id_veterinario", ""),
                 request.form.get("motivo", ""),
             )
@@ -355,12 +381,11 @@ def pago():
     if request.method == "POST":
         try:
             precios_texto = request.form.get("precios", "")
-            precios = [
-                float(valor.strip())
-                for valor in precios_texto.replace(",", "\n").splitlines()
-                if valor.strip()
-            ]
-            descuento = float(request.form.get("descuento", "0") or 0)
+            precios = _parse_precios(precios_texto)
+            descuento = _form_float(
+                "descuento",
+                "El descuento debe ser un numero valido.",
+            )
 
             subtotal = calcular_subtotal(precios)
             monto_descuento = aplicar_descuento(subtotal, descuento)
@@ -382,4 +407,9 @@ def pago():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, use_reloader=False)
+    app.run(
+        host=os.environ.get("HOST", "127.0.0.1"),
+        port=int(os.environ.get("PORT", "5000")),
+        debug=True,
+        use_reloader=False,
+    )

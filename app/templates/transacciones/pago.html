@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Pagos - VetClinic{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Pagos</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2><i class="bi bi-cash-stack me-2 text-success"></i>Calculadora de Pago</h2>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <form method="POST" novalidate>
+          <div class="mb-3">
+            <label for="precios" class="form-label">Precios de servicios <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="precios" name="precios" rows="6" placeholder="Ingrese un precio por linea o separado por comas">{{ request.form.get('precios', '') }}</textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="descuento" class="form-label">Descuento (%)</label>
+            <input type="number" min="0" max="100" step="0.01" class="form-control" id="descuento" name="descuento" value="{{ request.form.get('descuento', '0') }}">
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-calculator me-1"></i>Calcular
+            </button>
+            <a href="{{ url_for('pago') }}" class="btn btn-outline-secondary">Limpiar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-receipt me-2"></i>Resultado</div>
+      <div class="card-body">
+        {% if resultado %}
+          <div class="detail-row">
+            <span class="detail-label">Subtotal</span>
+            <span class="detail-value">S/ {{ "%.2f"|format(resultado.subtotal) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Descuento</span>
+            <span class="detail-value">{{ "%.2f"|format(resultado.descuento) }}%</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Monto descontado</span>
+            <span class="detail-value">S/ {{ "%.2f"|format(resultado.monto_descuento) }}</span>
+          </div>
+          <hr>
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="fw-semibold">Total a pagar</span>
+            <span class="fs-4 fw-bold text-success">S/ {{ "%.2f"|format(resultado.total) }}</span>
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <i class="bi bi-calculator d-block"></i>
+            <p>Ingrese precios para calcular el pago</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

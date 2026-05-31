@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Citas - VetClinic{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Citas</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2><i class="bi bi-calendar-check-fill me-2 text-info"></i>Citas</h2>
+  <a href="{{ url_for('nueva_cita') }}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Nueva Cita
+  </a>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    {% if citas %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Mascota</th>
+              <th>Veterinario</th>
+              <th>Motivo</th>
+              <th>Estado</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in citas %}
+            <tr>
+              <td><span class="badge bg-light text-dark">{{ c.id_cita }}</span></td>
+              <td>{{ c.fecha }}</td>
+              <td>{{ c.hora }}</td>
+              <td>
+                {% if mascotas.get(c.id_mascota) %}
+                  <a href="{{ url_for('detalle_mascota', id_mascota=c.id_mascota) }}">{{ mascotas[c.id_mascota].nombre }}</a>
+                {% else %}
+                  {{ c.id_mascota }}
+                {% endif %}
+              </td>
+              <td>
+                {% if veterinarios.get(c.id_veterinario) %}
+                  <a href="{{ url_for('detalle_veterinario', id_veterinario=c.id_veterinario) }}">{{ veterinarios[c.id_veterinario].nombre }}</a>
+                {% else %}
+                  {{ c.id_veterinario }}
+                {% endif %}
+              </td>
+              <td>{{ c.motivo }}</td>
+              <td>
+                {% if c.estado == 'Programada' %}
+                  <span class="badge bg-info bg-opacity-10 text-info badge-status">{{ c.estado }}</span>
+                {% else %}
+                  <span class="badge bg-success bg-opacity-10 text-success badge-status">{{ c.estado }}</span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                {% if c.estado == 'Programada' %}
+                  <a href="{{ url_for('atender_cita', id_cita=c.id_cita) }}" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-clipboard2-pulse"></i>
+                  </a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="bi bi-calendar-x d-block"></i>
+        <p>No hay citas registradas</p>
+        <a href="{{ url_for('nueva_cita') }}" class="btn btn-sm btn-primary">
+          <i class="bi bi-plus-lg me-1"></i>Agendar Cita
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

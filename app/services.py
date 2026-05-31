@@ -1,3 +1,4 @@
+import re
 from typing import List
 
 from app.models import (
@@ -15,6 +16,24 @@ from app.repository import (
     VeterinarioRepository,
 )
 
+EMAIL_REGEX = re.compile(
+    r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
+)
+
+
+def _texto_obligatorio(valor, campo: str) -> str:
+    if valor is None:
+        raise ValueError(f"{campo} no puede estar vacio.")
+    texto = str(valor).strip()
+    if not texto:
+        raise ValueError(f"{campo} no puede estar vacio.")
+    return texto
+
+
+def _validar_solo_letras_espacios(valor: str, campo: str) -> None:
+    if not all(caracter.isalpha() or caracter.isspace() for caracter in valor):
+        raise ValueError(f"{campo} solo debe contener letras y espacios.")
+
 
 class ClienteService:
     def __init__(self, repo: ClienteRepository):
@@ -23,28 +42,55 @@ class ClienteService:
     def registrar(
         self, id_cliente: str, nombre: str, telefono: str, email: str
     ) -> Cliente:
-        if not id_cliente or not id_cliente.strip():
-            raise ValueError("El ID del cliente no puede estar vacío.")
+        id_cliente = _texto_obligatorio(id_cliente, "El DNI del cliente")
+        nombre = _texto_obligatorio(nombre, "El nombre del cliente")
+        telefono = _texto_obligatorio(telefono, "El telefono del cliente")
+        email = _texto_obligatorio(email, "El correo del cliente")
+
+        if not id_cliente.isdigit():
+            raise ValueError("El DNI del cliente solo debe contener numeros.")
+        if not 8 <= len(id_cliente) <= 12:
+            raise ValueError("El DNI del cliente debe tener entre 8 y 12 digitos.")
         if self._repo.existe(id_cliente):
             raise ValueError(
                 f"Ya existe un cliente con ID '{id_cliente}'."
             )
-        if not nombre or not nombre.strip():
-            raise ValueError("El nombre del cliente no puede estar vacío.")
+        _validar_solo_letras_espacios(nombre, "El nombre del cliente")
+
+        if not telefono.isdigit():
+            raise ValueError("El telefono del cliente solo debe contener numeros.")
+        if not 7 <= len(telefono) <= 15:
+            raise ValueError(
+                "El telefono del cliente debe tener entre 7 y 15 digitos."
+            )
+
+        if not EMAIL_REGEX.fullmatch(email):
+            raise ValueError("El correo del cliente no tiene un formato valido.")
+        if any(
+            cliente.email.lower() == email.lower()
+            for cliente in self._repo.listar()
+        ):
+            raise ValueError(
+                f"Ya existe un cliente con correo '{email}'."
+            )
+
         cliente = Cliente(
-            id_cliente=id_cliente.strip(),
-            nombre=nombre.strip(),
-            telefono=telefono.strip(),
-            email=email.strip(),
+            id_cliente=id_cliente,
+            nombre=nombre,
+            telefono=telefono,
+            email=email,
         )
         self._repo.guardar(cliente)
         return cliente
 
     def buscar(self, id_cliente: str) -> Cliente:
+        id_cliente = _texto_obligatorio(id_cliente, "El DNI del cliente")
+        if not id_cliente.isdigit():
+            raise ValueError("El DNI del cliente solo debe contener numeros.")
         cliente = self._repo.buscar(id_cliente)
         if cliente is None:
             raise ValueError(
-                f"No se encontró un cliente con ID '{id_cliente}'."
+                f"No se encontro un cliente con ID '{id_cliente}'."
             )
         return cliente
 

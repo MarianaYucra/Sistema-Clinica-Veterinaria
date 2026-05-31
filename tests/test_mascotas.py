@@ -2,7 +2,7 @@ import pytest
 
 
 def _registrar_cliente_valido(cliente_repo, svc_cliente):
-    svc_cliente.registrar("CLI001", "Ana López", "987654321", "ana@mail.com")
+    svc_cliente.registrar("12345678", "Ana Lopez", "987654321", "ana@mail.com")
 
 
 # ────────────────────────────── registrar ───────────────────────────────
@@ -13,7 +13,7 @@ def test_registrar_mascota_exitoso(cliente_entorno, mascota_entorno):
     _registrar_cliente_valido(cliente_repo, svc_cliente)
 
     _, _, svc = mascota_entorno
-    m = svc.registrar("Firulais", "Canino", "Labrador", 3, 12.5, "CLI001")
+    m = svc.registrar("Firulais", "Canino", "Labrador", 3, 12.5, "12345678")
 
     assert m.nombre == "Firulais"
     assert m.edad == 3
@@ -36,7 +36,7 @@ def test_registrar_mascota_nombre_invalido_pe(
 
     _, _, svc = mascota_entorno
     with pytest.raises(ValueError):
-        svc.registrar(nombre, "Canino", "Labrador", 3, 12.5, "CLI001")
+        svc.registrar(nombre, "Canino", "Labrador", 3, 12.5, "12345678")
 
 
 def test_registrar_mascota_nombre_none(cliente_entorno, mascota_entorno):
@@ -45,7 +45,7 @@ def test_registrar_mascota_nombre_none(cliente_entorno, mascota_entorno):
 
     _, _, svc = mascota_entorno
     with pytest.raises(ValueError):
-        svc.registrar(None, "Canino", "Labrador", 3, 12.5, "CLI001")
+        svc.registrar(None, "Canino", "Labrador", 3, 12.5, "12345678")
 
 
 def test_registrar_mascota_nombre_int(cliente_entorno, mascota_entorno):
@@ -54,7 +54,7 @@ def test_registrar_mascota_nombre_int(cliente_entorno, mascota_entorno):
 
     _, _, svc = mascota_entorno
     with pytest.raises(AttributeError):
-        svc.registrar(123, "Canino", "Labrador", 3, 12.5, "CLI001")
+        svc.registrar(123, "Canino", "Labrador", 3, 12.5, "12345678")
 
 
 @pytest.mark.parametrize("edad", [-1])
@@ -66,7 +66,7 @@ def test_registrar_mascota_edad_invalida_bva(
 
     _, _, svc = mascota_entorno
     with pytest.raises(ValueError):
-        svc.registrar("Firulais", "Canino", "Labrador", edad, 12.5, "CLI001")
+        svc.registrar("Firulais", "Canino", "Labrador", edad, 12.5, "12345678")
 
 
 @pytest.mark.parametrize("edad", [0, 1])
@@ -77,7 +77,7 @@ def test_registrar_mascota_edad_valida_bva(
     _registrar_cliente_valido(cliente_repo, svc_cliente)
 
     _, _, svc = mascota_entorno
-    svc.registrar("Firulais", "Canino", "Labrador", edad, 12.5, "CLI001")
+    svc.registrar("Firulais", "Canino", "Labrador", edad, 12.5, "12345678")
 
 
 def test_registrar_mascota_edad_none(cliente_entorno, mascota_entorno):
@@ -86,7 +86,7 @@ def test_registrar_mascota_edad_none(cliente_entorno, mascota_entorno):
 
     _, _, svc = mascota_entorno
     with pytest.raises(TypeError):
-        svc.registrar("Firulais", "Canino", "Labrador", None, 12.5, "CLI001")
+        svc.registrar("Firulais", "Canino", "Labrador", None, 12.5, "12345678")
 
 
 def test_registrar_mascota_edad_str(cliente_entorno, mascota_entorno):
@@ -95,7 +95,7 @@ def test_registrar_mascota_edad_str(cliente_entorno, mascota_entorno):
 
     _, _, svc = mascota_entorno
     with pytest.raises(TypeError):
-        svc.registrar("Firulais", "Canino", "Labrador", "5", 12.5, "CLI001")
+        svc.registrar("Firulais", "Canino", "Labrador", "5", 12.5, "12345678")
 
 
 @pytest.mark.parametrize("peso", [-1, -0.1, 0])
@@ -107,7 +107,7 @@ def test_registrar_mascota_peso_invalido_bva(
 
     _, _, svc = mascota_entorno
     with pytest.raises(ValueError):
-        svc.registrar("Firulais", "Canino", "Labrador", 3, peso, "CLI001")
+        svc.registrar("Firulais", "Canino", "Labrador", 3, peso, "12345678")
 
 
 @pytest.mark.parametrize("peso", [0.1, 1])
@@ -118,7 +118,7 @@ def test_registrar_mascota_peso_valido_bva(
     _registrar_cliente_valido(cliente_repo, svc_cliente)
 
     _, _, svc = mascota_entorno
-    svc.registrar("Firulais", "Canino", "Labrador", 3, peso, "CLI001")
+    svc.registrar("Firulais", "Canino", "Labrador", 3, peso, "12345678")
 
 
 def test_registrar_mascota_peso_none(cliente_entorno, mascota_entorno):
@@ -127,7 +127,7 @@ def test_registrar_mascota_peso_none(cliente_entorno, mascota_entorno):
 
     _, _, svc = mascota_entorno
     with pytest.raises(TypeError):
-        svc.registrar("Firulais", "Canino", "Labrador", 3, None, "CLI001")
+        svc.registrar("Firulais", "Canino", "Labrador", 3, None, "12345678")
 
 
 def test_registrar_mascota_peso_str(cliente_entorno, mascota_entorno):
@@ -136,7 +136,7 @@ def test_registrar_mascota_peso_str(cliente_entorno, mascota_entorno):
 
     _, _, svc = mascota_entorno
     with pytest.raises(TypeError):
-        svc.registrar("Firulais", "Canino", "Labrador", 3, "2.5", "CLI001")
+        svc.registrar("Firulais", "Canino", "Labrador", 3, "2.5", "12345678")
 
 
 def test_registrar_mascota_id_cliente_inexistente(mascota_entorno):
@@ -163,7 +163,7 @@ def test_registrar_mascota_especie_none(cliente_entorno, mascota_entorno):
 
     _, _, svc = mascota_entorno
     with pytest.raises(AttributeError):
-        svc.registrar("Firulais", None, "Labrador", 3, 12.5, "CLI001")
+        svc.registrar("Firulais", None, "Labrador", 3, 12.5, "12345678")
 
 
 def test_registrar_mascota_especie_int(cliente_entorno, mascota_entorno):
@@ -172,7 +172,7 @@ def test_registrar_mascota_especie_int(cliente_entorno, mascota_entorno):
 
     _, _, svc = mascota_entorno
     with pytest.raises(AttributeError):
-        svc.registrar("Firulais", 456, "Labrador", 3, 12.5, "CLI001")
+        svc.registrar("Firulais", 456, "Labrador", 3, 12.5, "12345678")
 
 
 # ──────────────────────────────── buscar ────────────────────────────────
@@ -183,7 +183,7 @@ def test_buscar_mascota_existente(cliente_entorno, mascota_entorno):
     _registrar_cliente_valido(cliente_repo, svc_cliente)
 
     _, _, svc = mascota_entorno
-    m = svc.registrar("Firulais", "Canino", "Labrador", 3, 12.5, "CLI001")
+    m = svc.registrar("Firulais", "Canino", "Labrador", 3, 12.5, "12345678")
 
     resultado = svc.buscar(m.id_mascota)
     assert resultado.nombre == "Firulais"
@@ -226,8 +226,8 @@ def test_listar_mascotas_con_datos(cliente_entorno, mascota_entorno):
     _registrar_cliente_valido(cliente_repo, svc_cliente)
 
     _, _, svc = mascota_entorno
-    svc.registrar("Firulais", "Canino", "Labrador", 3, 12.5, "CLI001")
-    svc.registrar("Misi", "Felino", "Siamés", 5, 4.2, "CLI001")
+    svc.registrar("Firulais", "Canino", "Labrador", 3, 12.5, "12345678")
+    svc.registrar("Misi", "Felino", "Siames", 5, 4.2, "12345678")
 
     resultado = svc.listar()
     assert len(resultado) == 2

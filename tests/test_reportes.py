@@ -79,30 +79,30 @@ class TestListarClientes:
         assert resultado == []
 
     def test_rpt_lc_02_listar_con_un_registro(self, cliente_svc):
-        cliente_svc.registrar("C001", "Ana López", "555-0001", "ana@mail.com")
+        cliente_svc.registrar("12345678", "Ana Lopez", "5550001", "ana@mail.com")
 
         resultado = cliente_svc.listar()
 
         assert len(resultado) == 1
-        assert resultado[0].id_cliente == "C001"
+        assert resultado[0].id_cliente == "12345678"
 
     def test_rpt_lc_03_listar_con_multiples_registros(self, cliente_svc):
-        cliente_svc.registrar("C001", "Ana López", "555-0001", "ana@mail.com")
-        cliente_svc.registrar("C002", "Carlos Ruiz", "555-0002", "carlos@mail.com")
-        cliente_svc.registrar("C003", "María Torres", "555-0003", "maria@mail.com")
+        cliente_svc.registrar("12345678", "Ana Lopez", "5550001", "ana@mail.com")
+        cliente_svc.registrar("87654321", "Carlos Ruiz", "5550002", "carlos@mail.com")
+        cliente_svc.registrar("11223344", "Maria Torres", "5550003", "maria@mail.com")
 
         resultado = cliente_svc.listar()
 
         assert len(resultado) == 3
 
     def test_rpt_lc_04_verificar_integridad_datos(self, cliente_svc):
-        cliente_svc.registrar("C001", "Ana López", "555-0001", "ana@mail.com")
+        cliente_svc.registrar("12345678", "Ana Lopez", "5550001", "ana@mail.com")
 
         resultado = cliente_svc.listar()
 
         cliente = resultado[0]
-        assert cliente.nombre == "Ana López"
-        assert cliente.telefono == "555-0001"
+        assert cliente.nombre == "Ana Lopez"
+        assert cliente.telefono == "5550001"
         assert cliente.email == "ana@mail.com"
 
 
@@ -156,8 +156,8 @@ class TestListarMascotas:
         assert resultado == []
 
     def test_rpt_lm_02_listar_con_un_registro(self, cliente_svc, mascota_svc):
-        cliente_svc.registrar("C001", "Ana López", "555-0001", "ana@mail.com")
-        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "C001")
+        cliente_svc.registrar("12345678", "Ana Lopez", "5550001", "ana@mail.com")
+        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "12345678")
 
         resultado = mascota_svc.listar()
 
@@ -166,10 +166,10 @@ class TestListarMascotas:
     def test_rpt_lm_03_listar_con_multiples_registros(
         self, cliente_svc, mascota_svc
     ):
-        cliente_svc.registrar("C001", "Ana López", "555-0001", "ana@mail.com")
-        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "C001")
-        mascota_svc.registrar("Misu", "Gato", "Siamés", 2, 4.5, "C001")
-        mascota_svc.registrar("Rocky", "Perro", "Bulldog", 5, 18.0, "C001")
+        cliente_svc.registrar("12345678", "Ana Lopez", "5550001", "ana@mail.com")
+        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "12345678")
+        mascota_svc.registrar("Misu", "Gato", "Siames", 2, 4.5, "12345678")
+        mascota_svc.registrar("Rocky", "Perro", "Bulldog", 5, 18.0, "12345678")
 
         resultado = mascota_svc.listar()
 
@@ -178,12 +178,12 @@ class TestListarMascotas:
     def test_rpt_lm_04_verificar_vinculacion_cliente(
         self, cliente_svc, mascota_svc
     ):
-        cliente_svc.registrar("C001", "Ana López", "555-0001", "ana@mail.com")
-        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "C001")
+        cliente_svc.registrar("12345678", "Ana Lopez", "5550001", "ana@mail.com")
+        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "12345678")
 
         resultado = mascota_svc.listar()
 
-        assert resultado[0].id_cliente == "C001"
+        assert resultado[0].id_cliente == "12345678"
 
 
 # ============================================================
@@ -194,9 +194,9 @@ class TestListarMascotas:
 class TestListarCitas:
     @pytest.fixture(autouse=True)
     def _setup_entidades(self, cliente_svc, veterinario_svc, mascota_svc):
-        cliente_svc.registrar("C001", "Ana López", "555-0001", "ana@mail.com")
+        cliente_svc.registrar("12345678", "Ana Lopez", "5550001", "ana@mail.com")
         veterinario_svc.registrar("V001", "Dra. García", "Cirugía")
-        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "C001")
+        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "12345678")
 
     def test_rpt_lci_01_listar_sin_registros(self, cita_svc):
         resultado = cita_svc.listar()
@@ -245,13 +245,13 @@ class TestHistorialClinico:
     def _setup_entidades(
         self, cliente_svc, veterinario_svc, mascota_svc
     ):
-        cliente_svc.registrar("C001", "Ana López", "555-0001", "ana@mail.com")
+        cliente_svc.registrar("12345678", "Ana Lopez", "5550001", "ana@mail.com")
         veterinario_svc.registrar("V001", "Dra. García", "Cirugía")
 
     def test_rpt_hc_01_historial_sin_atenciones(
         self, mascota_svc, atencion_svc
     ):
-        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "C001")
+        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "12345678")
 
         resultado = atencion_svc.obtener_historial(1)
 
@@ -260,7 +260,7 @@ class TestHistorialClinico:
     def test_rpt_hc_02_historial_con_una_atencion(
         self, mascota_svc, cita_svc, atencion_svc
     ):
-        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "C001")
+        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "12345678")
         cita_svc.agendar("2026-06-01", "10:00", 1, "V001", "Vacunación")
         atencion_svc.registrar_atencion(1, "Sano", "Vacuna antirrábica", "")
 
@@ -272,7 +272,7 @@ class TestHistorialClinico:
     def test_rpt_hc_03_historial_multiples_atenciones_ordenadas(
         self, mascota_svc, cita_svc, atencion_svc, veterinario_svc
     ):
-        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "C001")
+        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "12345678")
         veterinario_svc.registrar("V002", "Dr. Mendoza", "Dermatología")
         veterinario_svc.registrar("V003", "Dra. Ríos", "Cardiología")
 
@@ -309,7 +309,7 @@ class TestHistorialClinico:
     def test_rpt_hc_07_historial_primer_id_autogenerado(
         self, mascota_svc, cita_svc, atencion_svc
     ):
-        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "C001")
+        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "12345678")
         cita_svc.agendar("2026-06-01", "10:00", 1, "V001", "Vacunación")
         atencion_svc.registrar_atencion(1, "Sano", "Vacuna", "")
 
@@ -320,8 +320,8 @@ class TestHistorialClinico:
     def test_rpt_hc_08_historial_segundo_id_autogenerado(
         self, mascota_svc, cita_svc, atencion_svc
     ):
-        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "C001")
-        mascota_svc.registrar("Misu", "Gato", "Siamés", 2, 4.5, "C001")
+        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "12345678")
+        mascota_svc.registrar("Misu", "Gato", "Siames", 2, 4.5, "12345678")
         cita_svc.agendar("2026-06-01", "10:00", 2, "V001", "Control")
         atencion_svc.registrar_atencion(1, "Sano", "Desparasitación", "")
 
@@ -333,8 +333,8 @@ class TestHistorialClinico:
         self, mascota_svc, cita_svc, atencion_svc, veterinario_svc
     ):
         veterinario_svc.registrar("V002", "Dr. Mendoza", "Dermatología")
-        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "C001")
-        mascota_svc.registrar("Misu", "Gato", "Siamés", 2, 4.5, "C001")
+        mascota_svc.registrar("Fido", "Perro", "Labrador", 3, 25.0, "12345678")
+        mascota_svc.registrar("Misu", "Gato", "Siames", 2, 4.5, "12345678")
 
         cita_svc.agendar("2026-06-01", "10:00", 1, "V001", "Vacunación")
         cita_svc.agendar("2026-06-01", "11:00", 1, "V002", "Control")
@@ -353,7 +353,7 @@ class TestHistorialClinico:
     def test_rpt_hc_10_verificar_contenido_registro(
         self, mascota_svc, cita_svc, atencion_svc
     ):
-        mascota_svc.registrar("Fido", "Perro", "Labrador", 5, 25.0, "C001")
+        mascota_svc.registrar("Fido", "Perro", "Labrador", 5, 25.0, "12345678")
         cita_svc.agendar("2026-06-01", "10:00", 1, "V001", "Revisión piel")
         atencion_svc.registrar_atencion(
             1, "Dermatitis", "Crema tópica", "Revisión en 15 días"

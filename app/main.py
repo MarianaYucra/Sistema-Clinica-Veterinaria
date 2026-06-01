@@ -1,3 +1,4 @@
+import datetime
 from app.repository import (
     CitaRepository,
     ClienteRepository,
@@ -75,6 +76,203 @@ def leer_campo_validado(mensaje: str, validador):
             return validador(input(mensaje))
         except ValueError as e:
             print(str(e))
+
+
+def leer_texto_mascota(mensaje: str, campo: str) -> str:
+    while True:
+        valor = input(mensaje).strip()
+
+        if not valor:
+            print(f"Error: {campo} no puede estar vacío.")
+            continue
+
+        if len(valor) < 2:
+            print(f"Error: {campo} debe tener al menos 2 caracteres.")
+            continue
+
+        if not all(c.isalpha() or c.isspace() for c in valor):
+            print(f"Error: {campo} solo puede contener letras y espacios.")
+            continue
+
+        return valor
+
+
+def leer_entero_rango(mensaje: str, minimo: int, maximo: int) -> int:
+    while True:
+        try:
+            valor = int(input(mensaje).strip())
+        except ValueError:
+            print("Error: Ingrese un número entero válido.")
+            continue
+
+        if valor < minimo:
+            print(f"Error: El valor no puede ser menor que {minimo}.")
+            continue
+
+        if valor > maximo:
+            print(f"Error: El valor no puede ser mayor que {maximo}.")
+            continue
+
+        return valor
+
+
+def leer_flotante_rango(mensaje: str, minimo: float, maximo: float) -> float:
+    while True:
+        try:
+            valor = float(input(mensaje).strip())
+        except ValueError:
+            print("Error: Ingrese un número válido.")
+            continue
+
+        if valor < minimo:
+            print(f"Error: El valor debe ser mayor o igual que {minimo}.")
+            continue
+
+        if valor > maximo:
+            print(f"Error: El valor no puede ser mayor que {maximo}.")
+            continue
+
+        return valor
+
+
+def leer_id_cliente_mascota(mensaje: str, servicio: MascotaService) -> str:
+    while True:
+        id_cliente = input(mensaje).strip()
+
+        if not id_cliente:
+            print("Error: El ID del cliente no puede estar vacío.")
+            continue
+
+        if not servicio._cliente_repo.existe(id_cliente):
+            print(
+                f"Error: No existe un cliente con ID '{id_cliente}'. "
+                "Registre al cliente primero."
+            )
+            continue
+
+        return id_cliente
+
+# Validaciones para citas
+
+
+def leer_fecha_cita(mensaje: str) -> str:
+    while True:
+        fecha = input(mensaje).strip()
+
+        if not fecha:
+            print("Error: La fecha no puede estar vacía.")
+            continue
+
+        try:
+            fecha_obj = datetime.datetime.strptime(fecha, "%Y-%m-%d").date()
+        except ValueError:
+            print("Error: La fecha debe tener el formato YYYY-MM-DD y ser válida.")
+            continue
+
+        if fecha_obj < datetime.date.today():
+            print("Error: La fecha de la cita no puede estar en el pasado.")
+            continue
+
+        return fecha
+
+
+def leer_hora_cita(mensaje: str, fecha: str) -> str:
+    while True:
+        hora = input(mensaje).strip()
+
+        if not hora:
+            print("Error: La hora no puede estar vacía.")
+            continue
+
+        try:
+            hora_obj = datetime.datetime.strptime(hora, "%H:%M").time()
+        except ValueError:
+            print("Error: La hora debe tener el formato HH:MM en formato de 24 horas.")
+            continue
+
+        fecha_obj = datetime.datetime.strptime(fecha, "%Y-%m-%d").date()
+        hoy = datetime.date.today()
+        hora_actual = datetime.datetime.now().time()
+
+        if fecha_obj == hoy and hora_obj <= hora_actual:
+            print("Error: La hora de la cita no puede estar en el pasado.")
+            continue
+
+        return hora
+
+
+def leer_id_mascota_cita(mensaje: str, servicio: CitaService) -> int:
+    while True:
+        try:
+            id_mascota = int(input(mensaje).strip())
+        except ValueError:
+            print("Error: El ID de la mascota debe ser un número entero.")
+            continue
+
+        if id_mascota <= 0:
+            print("Error: El ID de la mascota debe ser mayor a cero.")
+            continue
+
+        if not servicio._mascota_repo.existe(id_mascota):
+            print(f"Error: No existe una mascota con ID '{id_mascota}'.")
+            continue
+
+        return id_mascota
+
+
+def leer_id_veterinario_cita(
+    mensaje: str,
+    servicio: CitaService,
+    fecha: str,
+    hora: str
+) -> str:
+    while True:
+        id_veterinario = input(mensaje).strip().upper()
+
+        if not id_veterinario:
+            print("Error: El ID del veterinario no puede estar vacío.")
+            continue
+
+        if not servicio._veterinario_repo.existe(id_veterinario):
+            print(f"Error: No existe un veterinario con ID '{
+                  id_veterinario}'.")
+            continue
+
+        conflicto = servicio._repo.buscar_por_veterinario_fecha_hora(
+            id_veterinario,
+            fecha,
+            hora
+        )
+
+        if conflicto is not None:
+            print(
+                f"Error: El veterinario '{id_veterinario}' ya tiene una cita "
+                f"programada el {fecha} a las {hora}."
+            )
+            continue
+
+        return id_veterinario
+
+
+def leer_motivo_cita(mensaje: str) -> str:
+    while True:
+        motivo = input(mensaje).strip()
+
+        if not motivo:
+            print("Error: El motivo de la cita no puede estar vacío.")
+            continue
+
+        if len(motivo) < 3:
+            print("Error: El motivo de la cita debe tener al menos 3 caracteres.")
+            continue
+
+        if len(motivo) > 120:
+            print("Error: El motivo de la cita no puede superar los 120 caracteres.")
+            continue
+
+        return motivo
+
+# Validaciones para busqueda de clientes y veterinarios
 
 
 def validar_criterio_busqueda(valor: str) -> str:
@@ -231,22 +429,54 @@ def listar_veterinarios(servicio: VeterinarioService):
 
 
 def registrar_mascota(servicio: MascotaService):
-    print("\n--- Registrar Mascota ---")
-    nombre = input("Nombre: ")
-    especie = input("Especie: ")
-    raza = input("Raza: ")
-    edad = leer_entero("Edad (años): ")
-    peso = leer_flotante("Peso (kg): ")
-    id_cliente = input("ID del Cliente (dueño): ")
+    nombre = leer_texto_mascota(
+        "Nombre: ",
+        "El nombre de la mascota"
+    )
+
+    especie = leer_texto_mascota(
+        "Especie: ",
+        "La especie de la mascota"
+    )
+
+    raza = leer_texto_mascota(
+        "Raza: ",
+        "La raza de la mascota"
+    )
+
+    edad = leer_entero_rango(
+        "Edad (años): ",
+        minimo=0,
+        maximo=35
+    )
+
+    peso = leer_flotante_rango(
+        "Peso (kg): ",
+        minimo=0.01,
+        maximo=200
+    )
+
+    id_cliente = leer_id_cliente_mascota(
+        "ID del Cliente (dueño): ",
+        servicio
+    )
+
     try:
         mascota = servicio.registrar(
-            nombre, especie, raza, edad, peso, id_cliente)
+            nombre,
+            especie,
+            raza,
+            edad,
+            peso,
+            id_cliente
+        )
         print(
             f"Mascota '{mascota.nombre}' registrada con "
             f"ID {mascota.id_mascota}."
         )
+
     except ValueError as e:
-        print(str(e))
+        print(f"Error: {e}")
 
 
 def buscar_mascota(servicio: MascotaService):
@@ -280,14 +510,39 @@ def listar_mascotas(servicio: MascotaService):
 
 def agendar_cita(servicio: CitaService):
     print("\n--- Agendar Cita ---")
-    fecha = input("Fecha (YYYY-MM-DD): ")
-    hora = input("Hora (HH:MM): ")
-    id_mascota = leer_entero("ID Mascota: ")
-    id_vet = input("ID Veterinario: ")
-    motivo = input("Motivo: ")
+
+    fecha = leer_fecha_cita("Fecha (YYYY-MM-DD): ")
+
+    hora = leer_hora_cita(
+        "Hora (HH:MM): ",
+        fecha
+    )
+
+    id_mascota = leer_id_mascota_cita(
+        "ID Mascota: ",
+        servicio
+    )
+
+    id_vet = leer_id_veterinario_cita(
+        "ID Veterinario: ",
+        servicio,
+        fecha,
+        hora
+    )
+
+    motivo = leer_motivo_cita("Motivo: ")
+
     try:
-        cita = servicio.agendar(fecha, hora, id_mascota, id_vet, motivo)
+        cita = servicio.agendar(
+            fecha,
+            hora,
+            id_mascota,
+            id_vet,
+            motivo
+        )
+
         print(f"Cita agendada con ID {cita.id_cita}.")
+
     except ValueError as e:
         print(f"Error: {e}")
 
@@ -304,6 +559,8 @@ def listar_citas(servicio: CitaService):
             f"Mascota: {c.id_mascota} | Vet: {c.id_veterinario} | "
             f"Estado: {c.estado}"
         )
+
+# Registrar atencion
 
 
 def registrar_atencion(servicio: AtencionService):
@@ -325,6 +582,64 @@ def registrar_atencion(servicio: AtencionService):
             registrar_pago_atencion()
     except ValueError as e:
         print(f"Error: {e}")
+
+
+def leer_id_cita_atencion(mensaje: str, servicio: AtencionService) -> int:
+    while True:
+        try:
+            id_cita = int(input(mensaje).strip())
+        except ValueError:
+            print("Error: El ID de la cita debe ser un número entero.")
+            continue
+
+        if id_cita <= 0:
+            print("Error: El ID de la cita debe ser mayor a cero.")
+            continue
+
+        cita = servicio._cita_repo.buscar(id_cita)
+
+        if cita is None:
+            print(f"Error: No existe una cita con ID '{id_cita}'.")
+            continue
+
+        if cita.estado != "Programada":
+            print(
+                f"Error: La cita '{id_cita}' no está en estado 'Programada' "
+                f"(estado actual: '{cita.estado}')."
+            )
+            continue
+
+        return id_cita
+
+
+def leer_texto_atencion(mensaje: str, campo: str) -> str:
+    while True:
+        valor = input(mensaje).strip()
+
+        if not valor:
+            print(f"Error: {campo} no puede estar vacío.")
+            continue
+
+        if len(valor) < 3:
+            print(f"Error: {campo} debe tener al menos 3 caracteres.")
+            continue
+
+        if len(valor) > 200:
+            print(f"Error: {campo} no puede superar los 200 caracteres.")
+            continue
+
+        return valor
+
+
+def leer_observaciones_atencion(mensaje: str) -> str:
+    while True:
+        valor = input(mensaje).strip()
+
+        if len(valor) > 250:
+            print("Error: Las observaciones no pueden superar los 250 caracteres.")
+            continue
+
+        return valor
 
 
 def ver_historial(

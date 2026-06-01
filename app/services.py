@@ -24,7 +24,7 @@ def obtener_hoy() -> datetime.date:
 EMAIL_REGEX = re.compile(
     r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
 )
-CODIGO_VETERINARIO_REGEX = re.compile(r"^[A-Za-z]{1,5}[0-9]{3,6}$")
+CODIGO_VETERINARIO_REGEX = re.compile(r"^(?:[A-Za-z]{1,5})?[0-9]{3,6}$")
 
 
 def _texto_obligatorio(valor, campo: str) -> str:
@@ -49,12 +49,12 @@ def _validar_minimo_letras(valor: str, campo: str, minimo: int) -> None:
 
 def _validar_nombre_veterinario(valor: str) -> None:
     caracteres_validos = (
-        caracter.isalpha() or caracter.isspace() or caracter == "."
+        caracter.isalpha() or caracter.isspace()
         for caracter in valor
     )
     if not all(caracteres_validos):
         raise ValueError(
-            "El nombre del veterinario solo debe contener letras, espacios y puntos."
+            "El nombre del veterinario solo debe contener letras y espacios"
         )
     if not any(caracter.isalpha() for caracter in valor):
         raise ValueError("El nombre del veterinario debe contener letras.")
@@ -101,7 +101,7 @@ def validar_id_veterinario(valor: str) -> str:
     ).upper()
     if not CODIGO_VETERINARIO_REGEX.fullmatch(id_veterinario):
         raise ValueError(
-            "El ID del veterinario debe tener letras seguidas de 3 a 6 numeros."
+            "El ID del veterinario debe tener de 3 a 6 numeros seguidos"
         )
     return id_veterinario
 
@@ -243,48 +243,57 @@ class MascotaService:
             raise ValueError("El nombre de la mascota no puede estar vacío.")
         if len(nombre_stripped) < 2:
             raise ValueError(
-                "El nombre de la mascota debe tener al menos 2 caracteres.")
-        if not re.match(r"^[A-Za-z0-9\s.\-]+$", nombre_stripped):
+                "El nombre de la mascota debe tener al menos 2 caracteres."
+            )
+        # Allow alphabetic Unicode characters (including accents) and spaces
+        if not all(c.isalpha() or c.isspace() for c in nombre_stripped):
             raise ValueError(
-                "El nombre de la mascota solo puede contener letras, números, espacios, puntos y guiones.")
+                "El nombre de la mascota solo puede contener letras y espacios."
+            )
 
         if especie is None:
-            raise AttributeError("La especie no puede ser nula.")
+            raise ValueError("La especie no puede ser nula.")
         especie_stripped = especie.strip()
         if not especie_stripped:
             raise ValueError("La especie de la mascota no puede estar vacía.")
         if len(especie_stripped) < 2:
             raise ValueError(
-                "La especie de la mascota debe tener al menos 2 caracteres.")
+                "La especie de la mascota debe tener al menos 2 caracteres."
+            )
         if not all(c.isalpha() or c.isspace() for c in especie_stripped):
             raise ValueError(
-                "La especie de la mascota solo debe contener letras y espacios.")
+                "La especie de la mascota solo debe contener letras y espacios."
+            )
 
         if raza is None:
-            raise AttributeError("La raza no puede ser nula.")
+            raise ValueError("La raza no puede ser nula.")
         raza_stripped = raza.strip()
         if not raza_stripped:
             raise ValueError("La raza de la mascota no puede estar vacía.")
-        if len(raza_stripped) < 2:
+        if len(raza_stripped) < 3:
             raise ValueError(
-                "La raza de la mascota debe tener al menos 2 caracteres.")
-        if not all(c.isalpha() or c.isspace() or c == "-" for c in raza_stripped):
+                "La raza de la mascota debe tener al menos 3 caracteres."
+            )
+        if not all(c.isalpha() or c.isspace() for c in raza_stripped):
             raise ValueError(
-                "La raza de la mascota solo debe contener letras, espacios y guiones.")
+                "La raza de la mascota solo debe contener letras y espacios."
+            )
 
         if not isinstance(edad, int) or isinstance(edad, bool):
-            raise TypeError("La edad debe ser un número entero.")
+            raise ValueError("La edad debe ser un número entero.")
         if edad < 0:
             raise ValueError("La edad no puede ser negativa.")
-        if edad > 150:
-            raise ValueError("La edad de la mascota no es realista.")
+        if edad > 35:
+            raise ValueError(
+                "La edad de la mascota no puede superar los 35 años.")
 
         if not isinstance(peso, (int, float)) or isinstance(peso, bool):
-            raise TypeError("El peso debe ser un número.")
+            raise ValueError("El peso debe ser un número.")
         if peso <= 0:
             raise ValueError("El peso debe ser mayor a cero.")
-        if peso > 1000:
-            raise ValueError("El peso de la mascota no es realista.")
+        if peso > 200:
+            raise ValueError(
+                "El peso de la mascota no puede superar los 200 kilos.")
 
         if id_cliente is None:
             raise ValueError("El ID del cliente no puede ser nulo.")
@@ -293,7 +302,6 @@ class MascotaService:
         id_cliente_stripped = id_cliente.strip()
         if not id_cliente_stripped:
             raise ValueError("El ID del cliente no puede estar vacío.")
-
         if not self._cliente_repo.existe(id_cliente_stripped):
             raise ValueError(
                 f"No existe un cliente con ID '{id_cliente_stripped}'. "
@@ -385,10 +393,15 @@ class CitaService:
 
         # Validar formato de hora (HH:MM)
         try:
-            datetime.datetime.strptime(hora_stripped, "%H:%M")
+            hora_obj = datetime.datetime.strptime(
+                hora_stripped, "%H:%M").time()
         except ValueError:
             raise ValueError(
-                "La hora debe tener el formato HH:MM (24 horas) y ser una hora válida.")
+                "La hora debe tener el formato HH:MM (24 horas) y ser una hora válida."
+            )
+
+        if fecha_obj == obtener_hoy() and hora_obj <= datetime.datetime.now().time():
+            raise ValueError("La hora de la cita no puede estar en el pasado.")
 
         # Validar motivo
         if len(motivo_stripped) < 3:

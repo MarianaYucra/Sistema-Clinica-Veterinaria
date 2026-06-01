@@ -1,17 +1,23 @@
-FROM python:3.11-slim
+# BUILDER (Compilación a Bytecode)
+FROM python:3.13.12-slim AS builder
+WORKDIR /build
 
-# this is for no wait to fill the buffer before to print the message
-ENV PYTHONUNBUFFERED=1 
-
-WORKDIR /app
-
-COPY . /app
-
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 5000
+COPY app/ ./app/
+RUN rm -f ./app/webapp.py
+RUN python -m compileall -b ./app/
+RUN find ./app/ -name "*.py" -type f -delete
 
-ENV HOST=0.0.0.0
-ENV PORT=5000
+# RUNNER (Imagen Final)
+FROM python:3.13.12-slim
 
-CMD ["python", "-m", "app.webapp"]
+ENV PYTHONUNBUFFERED=1
+WORKDIR /sistema
+
+COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=builder /build/app ./app
+
+RUN mkdir -p data
+CMD ["python", "-m", "app.main"]

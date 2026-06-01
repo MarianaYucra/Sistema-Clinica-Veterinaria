@@ -1,5 +1,6 @@
 .git
 .github
+
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -8,6 +9,11 @@ __pycache__/
 .venv/
 venv/
 env/
-tests/
-docs/
 .DS_Store
+
+docs/
+tests/
+data/
+app/templates/
+app/static/
+app/webapp.py

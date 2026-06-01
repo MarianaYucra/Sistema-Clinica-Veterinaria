@@ -230,27 +230,75 @@ class MascotaService:
         peso: float,
         id_cliente: str,
     ) -> Mascota:
-        if not nombre or not nombre.strip():
+        if nombre is None:
+            raise ValueError("El nombre de la mascota no puede ser nulo.")
+        nombre_stripped = nombre.strip()
+        if not nombre_stripped:
             raise ValueError("El nombre de la mascota no puede estar vacío.")
-        if not self._cliente_repo.existe(id_cliente):
-            raise ValueError(
-                f"No existe un cliente con ID '{id_cliente}'. "
-                "Registre al cliente primero."
-            )
+        if len(nombre_stripped) < 2:
+            raise ValueError("El nombre de la mascota debe tener al menos 2 caracteres.")
+        if not re.match(r"^[A-Za-z0-9\s.\-]+$", nombre_stripped):
+            raise ValueError("El nombre de la mascota solo puede contener letras, números, espacios, puntos y guiones.")
+
+        if especie is None:
+            raise AttributeError("La especie no puede ser nula.")
+        especie_stripped = especie.strip()
+        if not especie_stripped:
+            raise ValueError("La especie de la mascota no puede estar vacía.")
+        if len(especie_stripped) < 2:
+            raise ValueError("La especie de la mascota debe tener al menos 2 caracteres.")
+        if not all(c.isalpha() or c.isspace() for c in especie_stripped):
+            raise ValueError("La especie de la mascota solo debe contener letras y espacios.")
+
+        if raza is None:
+            raise AttributeError("La raza no puede ser nula.")
+        raza_stripped = raza.strip()
+        if not raza_stripped:
+            raise ValueError("La raza de la mascota no puede estar vacía.")
+        if len(raza_stripped) < 2:
+            raise ValueError("La raza de la mascota debe tener al menos 2 caracteres.")
+        if not all(c.isalpha() or c.isspace() or c == "-" for c in raza_stripped):
+            raise ValueError("La raza de la mascota solo debe contener letras, espacios y guiones.")
+
+        if not isinstance(edad, int) or isinstance(edad, bool):
+            raise TypeError("La edad debe ser un número entero.")
         if edad < 0:
             raise ValueError("La edad no puede ser negativa.")
+        if edad > 150:
+            raise ValueError("La edad de la mascota no es realista.")
+
+        if not isinstance(peso, (int, float)) or isinstance(peso, bool):
+            raise TypeError("El peso debe ser un número.")
         if peso <= 0:
             raise ValueError("El peso debe ser mayor a cero.")
+        if peso > 1000:
+            raise ValueError("El peso de la mascota no es realista.")
+
+        if id_cliente is None:
+            raise ValueError("El ID del cliente no puede ser nulo.")
+        if not isinstance(id_cliente, str):
+            raise ValueError("El ID del cliente debe ser una cadena de texto.")
+        id_cliente_stripped = id_cliente.strip()
+        if not id_cliente_stripped:
+            raise ValueError("El ID del cliente no puede estar vacío.")
+
+        if not self._cliente_repo.existe(id_cliente_stripped):
+            raise ValueError(
+                f"No existe un cliente con ID '{id_cliente_stripped}'. "
+                "Registre al cliente primero."
+            )
+
         mascota = Mascota(
             id_mascota=0,
-            nombre=nombre.strip(),
-            especie=especie.strip(),
-            raza=raza.strip(),
+            nombre=nombre_stripped,
+            especie=especie_stripped,
+            raza=raza_stripped,
             edad=edad,
             peso=peso,
-            id_cliente=id_cliente,
+            id_cliente=id_cliente_stripped,
         )
         return self._repo.guardar(mascota)
+
 
     def buscar(self, id_mascota: int) -> Mascota:
         mascota = self._repo.buscar(id_mascota)
@@ -283,35 +331,75 @@ class CitaService:
         id_veterinario: str,
         motivo: str,
     ) -> Cita:
-        if not fecha or not fecha.strip():
+        import datetime
+
+        # Check types
+        if not isinstance(fecha, str):
+            raise ValueError("La fecha debe ser una cadena de texto.")
+        if not isinstance(hora, str):
+            raise ValueError("La hora debe ser una cadena de texto.")
+        if not isinstance(id_mascota, int) or isinstance(id_mascota, bool):
+            raise ValueError("El ID de la mascota debe ser un número entero.")
+        if not isinstance(id_veterinario, str):
+            raise ValueError("El ID del veterinario debe ser una cadena de texto.")
+        if not isinstance(motivo, str):
+            raise ValueError("El motivo debe ser una cadena de texto.")
+
+        fecha_stripped = fecha.strip()
+        hora_stripped = hora.strip()
+        id_veterinario_stripped = id_veterinario.strip()
+        motivo_stripped = motivo.strip()
+
+        if not fecha_stripped:
             raise ValueError("La fecha no puede estar vacía.")
-        if not hora or not hora.strip():
+        if not hora_stripped:
             raise ValueError("La hora no puede estar vacía.")
-        if not self._mascota_repo.existe(id_mascota):
-            raise ValueError(
-                f"No existe una mascota con ID '{id_mascota}'."
-            )
-        if not self._veterinario_repo.existe(id_veterinario):
-            raise ValueError(
-                f"No existe un veterinario con ID '{id_veterinario}'."
-            )
-        if not motivo or not motivo.strip():
+        if not id_veterinario_stripped:
+            raise ValueError("El ID del veterinario no puede estar vacío.")
+        if not motivo_stripped:
             raise ValueError("El motivo de la cita no puede estar vacío.")
+
+        # Validar formato de fecha (YYYY-MM-DD) y validez del calendario
+        try:
+            datetime.datetime.strptime(fecha_stripped, "%Y-%m-%d")
+        except ValueError:
+            raise ValueError("La fecha debe tener el formato YYYY-MM-DD y ser una fecha válida.")
+
+        # Validar formato de hora (HH:MM)
+        try:
+            datetime.datetime.strptime(hora_stripped, "%H:%M")
+        except ValueError:
+            raise ValueError("La hora debe tener el formato HH:MM (24 horas) y ser una hora válida.")
+
+        # Validar motivo
+        if len(motivo_stripped) < 3:
+            raise ValueError("El motivo de la cita debe tener al menos 3 caracteres.")
+
+        # Validar existencia de mascota
+        if not self._mascota_repo.existe(id_mascota):
+            raise ValueError(f"No existe una mascota con ID '{id_mascota}'.")
+
+        # Validar existencia de veterinario
+        if not self._veterinario_repo.existe(id_veterinario_stripped):
+            raise ValueError(f"No existe un veterinario con ID '{id_veterinario_stripped}'.")
+
+        # Validar conflicto de agenda
         conflicto = self._repo.buscar_por_veterinario_fecha_hora(
-            id_veterinario, fecha.strip(), hora.strip()
+            id_veterinario_stripped, fecha_stripped, hora_stripped
         )
         if conflicto is not None:
             raise ValueError(
-                f"El veterinario '{id_veterinario}' ya tiene una cita "
-                f"programada el {fecha} a las {hora}."
+                f"El veterinario '{id_veterinario_stripped}' ya tiene una cita "
+                f"programada el {fecha_stripped} a las {hora_stripped}."
             )
+
         cita = Cita(
             id_cita=0,
-            fecha=fecha.strip(),
-            hora=hora.strip(),
+            fecha=fecha_stripped,
+            hora=hora_stripped,
             id_mascota=id_mascota,
-            id_veterinario=id_veterinario,
-            motivo=motivo.strip(),
+            id_veterinario=id_veterinario_stripped,
+            motivo=motivo_stripped,
         )
         return self._repo.guardar(cita)
 

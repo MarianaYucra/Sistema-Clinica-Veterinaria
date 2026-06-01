@@ -1,11 +1,3 @@
-import datetime
-import re
-from typing import List, Union
-
-
-def obtener_hoy() -> datetime.date:
-    return datetime.date.today()
-
 from app.models import (
     Cita,
     Cliente,
@@ -20,6 +12,14 @@ from app.repository import (
     RegistroClinicoRepository,
     VeterinarioRepository,
 )
+import datetime
+import re
+from typing import List, Union
+
+
+def obtener_hoy() -> datetime.date:
+    return datetime.date.today()
+
 
 EMAIL_REGEX = re.compile(
     r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
@@ -159,7 +159,8 @@ class ClienteService:
         return cliente
 
     def buscar(self, criterio: str) -> Cliente:
-        criterio = _texto_obligatorio(criterio, "El dato de busqueda del cliente")
+        criterio = _texto_obligatorio(
+            criterio, "El dato de busqueda del cliente")
         cliente = self._repo.buscar(criterio)
         if cliente is None and EMAIL_REGEX.fullmatch(criterio):
             cliente = self._repo.buscar_por_email(criterio)
@@ -241,9 +242,11 @@ class MascotaService:
         if not nombre_stripped:
             raise ValueError("El nombre de la mascota no puede estar vacío.")
         if len(nombre_stripped) < 2:
-            raise ValueError("El nombre de la mascota debe tener al menos 2 caracteres.")
+            raise ValueError(
+                "El nombre de la mascota debe tener al menos 2 caracteres.")
         if not re.match(r"^[A-Za-z0-9\s.\-]+$", nombre_stripped):
-            raise ValueError("El nombre de la mascota solo puede contener letras, números, espacios, puntos y guiones.")
+            raise ValueError(
+                "El nombre de la mascota solo puede contener letras, números, espacios, puntos y guiones.")
 
         if especie is None:
             raise AttributeError("La especie no puede ser nula.")
@@ -251,9 +254,11 @@ class MascotaService:
         if not especie_stripped:
             raise ValueError("La especie de la mascota no puede estar vacía.")
         if len(especie_stripped) < 2:
-            raise ValueError("La especie de la mascota debe tener al menos 2 caracteres.")
+            raise ValueError(
+                "La especie de la mascota debe tener al menos 2 caracteres.")
         if not all(c.isalpha() or c.isspace() for c in especie_stripped):
-            raise ValueError("La especie de la mascota solo debe contener letras y espacios.")
+            raise ValueError(
+                "La especie de la mascota solo debe contener letras y espacios.")
 
         if raza is None:
             raise AttributeError("La raza no puede ser nula.")
@@ -261,9 +266,11 @@ class MascotaService:
         if not raza_stripped:
             raise ValueError("La raza de la mascota no puede estar vacía.")
         if len(raza_stripped) < 2:
-            raise ValueError("La raza de la mascota debe tener al menos 2 caracteres.")
+            raise ValueError(
+                "La raza de la mascota debe tener al menos 2 caracteres.")
         if not all(c.isalpha() or c.isspace() or c == "-" for c in raza_stripped):
-            raise ValueError("La raza de la mascota solo debe contener letras, espacios y guiones.")
+            raise ValueError(
+                "La raza de la mascota solo debe contener letras, espacios y guiones.")
 
         if not isinstance(edad, int) or isinstance(edad, bool):
             raise TypeError("La edad debe ser un número entero.")
@@ -303,7 +310,6 @@ class MascotaService:
             id_cliente=id_cliente_stripped,
         )
         return self._repo.guardar(mascota)
-
 
     def buscar(self, id_mascota: int) -> Mascota:
         mascota = self._repo.buscar(id_mascota)
@@ -346,7 +352,8 @@ class CitaService:
         if not isinstance(id_mascota, int) or isinstance(id_mascota, bool):
             raise ValueError("El ID de la mascota debe ser un número entero.")
         if not isinstance(id_veterinario, str):
-            raise ValueError("El ID del veterinario debe ser una cadena de texto.")
+            raise ValueError(
+                "El ID del veterinario debe ser una cadena de texto.")
         if not isinstance(motivo, str):
             raise ValueError("El motivo debe ser una cadena de texto.")
 
@@ -366,22 +373,27 @@ class CitaService:
 
         # Validar formato de fecha (YYYY-MM-DD) y validez del calendario
         try:
-            fecha_obj = datetime.datetime.strptime(fecha_stripped, "%Y-%m-%d").date()
+            fecha_obj = datetime.datetime.strptime(
+                fecha_stripped, "%Y-%m-%d").date()
         except ValueError:
-            raise ValueError("La fecha debe tener el formato YYYY-MM-DD y ser una fecha válida.")
+            raise ValueError(
+                "La fecha debe tener el formato YYYY-MM-DD y ser una fecha válida.")
 
         if fecha_obj < obtener_hoy():
-            raise ValueError("La fecha de la cita no puede estar en el pasado.")
+            raise ValueError(
+                "La fecha de la cita no puede estar en el pasado.")
 
         # Validar formato de hora (HH:MM)
         try:
             datetime.datetime.strptime(hora_stripped, "%H:%M")
         except ValueError:
-            raise ValueError("La hora debe tener el formato HH:MM (24 horas) y ser una hora válida.")
+            raise ValueError(
+                "La hora debe tener el formato HH:MM (24 horas) y ser una hora válida.")
 
         # Validar motivo
         if len(motivo_stripped) < 3:
-            raise ValueError("El motivo de la cita debe tener al menos 3 caracteres.")
+            raise ValueError(
+                "El motivo de la cita debe tener al menos 3 caracteres.")
 
         # Validar existencia de mascota
         if not self._mascota_repo.existe(id_mascota):
@@ -389,7 +401,8 @@ class CitaService:
 
         # Validar existencia de veterinario
         if not self._veterinario_repo.existe(id_veterinario_stripped):
-            raise ValueError(f"No existe un veterinario con ID '{id_veterinario_stripped}'.")
+            raise ValueError(f"No existe un veterinario con ID '{
+                             id_veterinario_stripped}'.")
 
         # Validar conflicto de agenda
         conflicto = self._repo.buscar_por_veterinario_fecha_hora(
@@ -397,7 +410,8 @@ class CitaService:
         )
         if conflicto is not None:
             raise ValueError(
-                f"El veterinario '{id_veterinario_stripped}' ya tiene una cita "
+                f"El veterinario '{
+                    id_veterinario_stripped}' ya tiene una cita "
                 f"programada el {fecha_stripped} a las {hora_stripped}."
             )
 
@@ -437,20 +451,51 @@ class AtencionService:
         tratamiento: str,
         observaciones: str,
     ) -> RegistroClinico:
+
+        # Validación de Tipado y Rango del ID
+        if not isinstance(id_cita, int) or isinstance(id_cita, bool):
+            raise ValueError("El ID de la cita debe ser un número entero.")
+        if id_cita <= 0:
+            raise ValueError(
+                "El ID de la cita debe ser un valor positivo válido.")
+
+        # Validación de Dependencia y Estado de la Cita
         cita = self._cita_repo.buscar(id_cita)
         if cita is None:
-            raise ValueError(
-                f"No se encontró una cita con ID '{id_cita}'."
-            )
+            raise ValueError(f"No se encontró una cita con ID '{id_cita}'.")
         if cita.estado != "Programada":
             raise ValueError(
                 f"La cita '{id_cita}' no está en estado 'Programada' "
                 f"(estado actual: '{cita.estado}')."
             )
-        if not diagnostico or not diagnostico.strip():
-            raise ValueError("El diagnóstico no puede estar vacío.")
-        if not tratamiento or not tratamiento.strip():
-            raise ValueError("El tratamiento no puede estar vacío.")
+
+        # Validación de Dominio: Diagnóstico
+        if not isinstance(diagnostico, str):
+            raise ValueError("El diagnóstico debe ser una cadena de texto.")
+        diagnostico_strip = diagnostico.strip()
+        if len(diagnostico_strip) < 5:
+            raise ValueError(
+                "El diagnóstico debe contener al menos 5 caracteres.")
+        if not any(c.isalpha() for c in diagnostico_strip):
+            raise ValueError(
+                "El diagnóstico debe contener caracteres alfabéticos válidos.")
+
+        # Validación de Dominio: Tratamiento
+        if not isinstance(tratamiento, str):
+            raise ValueError("El tratamiento debe ser una cadena de texto.")
+        tratamiento_strip = tratamiento.strip()
+        if len(tratamiento_strip) < 5:
+            raise ValueError(
+                "El tratamiento debe contener al menos 5 caracteres.")
+        if not any(c.isalpha() for c in tratamiento_strip):
+            raise ValueError(
+                "El tratamiento debe contener caracteres alfabéticos válidos.")
+
+        # Validación de Dominio: Observaciones
+        if observaciones is not None and not isinstance(observaciones, str):
+            raise ValueError(
+                "Las observaciones deben ser una cadena de texto.")
+        observaciones_strip = observaciones.strip() if observaciones else ""
 
         cita.estado = "Completada"
         self._cita_repo.actualizar_estado(id_cita, cita.estado)
@@ -460,9 +505,9 @@ class AtencionService:
             id_cita=id_cita,
             id_mascota=cita.id_mascota,
             fecha=cita.fecha,
-            diagnostico=diagnostico.strip(),
-            tratamiento=tratamiento.strip(),
-            observaciones=observaciones.strip() if observaciones else "",
+            diagnostico=diagnostico_strip,
+            tratamiento=tratamiento_strip,
+            observaciones=observaciones_strip
         )
         return self._registro_repo.guardar(registro)
 

@@ -53,6 +53,14 @@ def leer_entero(mensaje: str) -> int:
             print("Error: Ingrese un número entero válido.")
 
 
+def leer_entero_positivo(mensaje: str) -> int:
+    while True:
+        valor = leer_entero(mensaje)
+        if valor > 0:
+            return valor
+        print("Error: El número ingresado debe ser positivo y mayor a cero.")
+
+
 def leer_flotante(mensaje: str) -> float:
     while True:
         try:
@@ -180,7 +188,8 @@ def listar_clientes(servicio: ClienteService):
 def registrar_veterinario(servicio: VeterinarioService):
     print("\n--- Registrar Veterinario ---")
     while True:
-        id_vet = leer_campo_validado("ID Veterinario: ", validar_id_veterinario)
+        id_vet = leer_campo_validado(
+            "ID Veterinario: ", validar_id_veterinario)
         nombre = leer_campo_validado("Nombre: ", validar_nombre_veterinario)
         especialidad = leer_campo_validado(
             "Especialidad: ", validar_especialidad_veterinario
@@ -201,7 +210,8 @@ def buscar_veterinario(servicio: VeterinarioService):
     )
     try:
         resultado = servicio.buscar(criterio)
-        veterinarios = resultado if isinstance(resultado, list) else [resultado]
+        veterinarios = resultado if isinstance(
+            resultado, list) else [resultado]
         for v in veterinarios:
             print(f"  ID: {v.id_veterinario}")
             print(f"  Nombre: {v.nombre}")
@@ -229,7 +239,8 @@ def registrar_mascota(servicio: MascotaService):
     peso = leer_flotante("Peso (kg): ")
     id_cliente = input("ID del Cliente (dueño): ")
     try:
-        mascota = servicio.registrar(nombre, especie, raza, edad, peso, id_cliente)
+        mascota = servicio.registrar(
+            nombre, especie, raza, edad, peso, id_cliente)
         print(
             f"Mascota '{mascota.nombre}' registrada con "
             f"ID {mascota.id_mascota}."
@@ -297,7 +308,7 @@ def listar_citas(servicio: CitaService):
 
 def registrar_atencion(servicio: AtencionService):
     print("\n--- Registrar Atención ---")
-    id_cita = leer_entero("ID Cita a atender: ")
+    id_cita = leer_entero_positivo("ID Cita a atender: ")
     diagnostico = input("Diagnóstico: ")
     tratamiento = input("Tratamiento: ")
     observaciones = input("Observaciones (opcional): ")
@@ -334,7 +345,8 @@ def ver_historial(
 
     print(f"Historial de '{mascota.nombre}' ({len(registros)} registro(s)):\n")
     for r in registros:
-        print(f"  Registro #{r.id_registro} | Fecha: {r.fecha} | Cita: {r.id_cita}")
+        print(f"  Registro #{r.id_registro} | Fecha: {
+              r.fecha} | Cita: {r.id_cita}")
         print(f"    Diagnóstico:   {r.diagnostico}")
         print(f"    Tratamiento:   {r.tratamiento}")
         print(f"    Observaciones: {r.observaciones}")
@@ -395,4 +407,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

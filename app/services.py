@@ -1,5 +1,10 @@
+import datetime
 import re
 from typing import List, Union
+
+
+def obtener_hoy() -> datetime.date:
+    return datetime.date.today()
 
 from app.models import (
     Cita,
@@ -361,9 +366,12 @@ class CitaService:
 
         # Validar formato de fecha (YYYY-MM-DD) y validez del calendario
         try:
-            datetime.datetime.strptime(fecha_stripped, "%Y-%m-%d")
+            fecha_obj = datetime.datetime.strptime(fecha_stripped, "%Y-%m-%d").date()
         except ValueError:
             raise ValueError("La fecha debe tener el formato YYYY-MM-DD y ser una fecha válida.")
+
+        if fecha_obj < obtener_hoy():
+            raise ValueError("La fecha de la cita no puede estar en el pasado.")
 
         # Validar formato de hora (HH:MM)
         try:

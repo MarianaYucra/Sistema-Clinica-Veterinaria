@@ -1,3 +1,4 @@
+import datetime
 import pytest
 from app.repository import (
     CitaRepository,
@@ -11,6 +12,8 @@ from app.services import (
     MascotaService,
     VeterinarioService,
 )
+
+FUTURO_STR = (datetime.date.today() + datetime.timedelta(days=5)).isoformat()
 
 @pytest.fixture
 def clean_repos():
@@ -103,22 +106,22 @@ def test_agendar_cita_fecha_tipo_invalido(setup_services):
 def test_agendar_cita_hora_tipo_invalido(setup_services):
     _, cit_svc = setup_services
     with pytest.raises(ValueError, match="La hora debe ser una cadena de texto"):
-        cit_svc.agendar("2026-06-05", 1000, 1, "VET123", "Control")
+        cit_svc.agendar(FUTURO_STR, 1000, 1, "VET123", "Control")
 
 def test_agendar_cita_id_mascota_tipo_invalido(setup_services):
     _, cit_svc = setup_services
     with pytest.raises(ValueError, match="El ID de la mascota debe ser un número entero"):
-        cit_svc.agendar("2026-06-05", "10:00", "1", "VET123", "Control")
+        cit_svc.agendar(FUTURO_STR, "10:00", "1", "VET123", "Control")
 
 def test_agendar_cita_id_veterinario_tipo_invalido(setup_services):
     _, cit_svc = setup_services
     with pytest.raises(ValueError, match="El ID del veterinario debe ser una cadena de texto"):
-        cit_svc.agendar("2026-06-05", "10:00", 1, 123, "Control")
+        cit_svc.agendar(FUTURO_STR, "10:00", 1, 123, "Control")
 
 def test_agendar_cita_motivo_tipo_invalido(setup_services):
     _, cit_svc = setup_services
     with pytest.raises(ValueError, match="El motivo debe ser una cadena de texto"):
-        cit_svc.agendar("2026-06-05", "10:00", 1, "VET123", 123)
+        cit_svc.agendar(FUTURO_STR, "10:00", 1, "VET123", 123)
 
 def test_agendar_cita_fecha_formato_invalido(setup_services):
     _, cit_svc = setup_services
@@ -133,14 +136,20 @@ def test_agendar_cita_fecha_calendario_invalido(setup_services):
 def test_agendar_cita_hora_formato_invalido(setup_services):
     _, cit_svc = setup_services
     with pytest.raises(ValueError, match="La hora debe tener el formato HH:MM"):
-        cit_svc.agendar("2026-06-05", "10:00 AM", 1, "VET123", "Control")
+        cit_svc.agendar(FUTURO_STR, "10:00 AM", 1, "VET123", "Control")
 
 def test_agendar_cita_hora_invalida(setup_services):
     _, cit_svc = setup_services
     with pytest.raises(ValueError, match="La hora debe tener el formato HH:MM"):
-        cit_svc.agendar("2026-06-05", "25:00", 1, "VET123", "Control")
+        cit_svc.agendar(FUTURO_STR, "25:00", 1, "VET123", "Control")
 
 def test_agendar_cita_motivo_corto(setup_services):
     _, cit_svc = setup_services
     with pytest.raises(ValueError, match="El motivo de la cita debe tener al menos 3 caracteres"):
-        cit_svc.agendar("2026-06-05", "10:00", 1, "VET123", "Co")
+        cit_svc.agendar(FUTURO_STR, "10:00", 1, "VET123", "Co")
+
+def test_agendar_cita_fecha_en_el_pasado(setup_services):
+    _, cit_svc = setup_services
+    ayer = (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
+    with pytest.raises(ValueError, match="La fecha de la cita no puede estar en el pasado"):
+        cit_svc.agendar(ayer, "10:00", 1, "VET123", "Control")

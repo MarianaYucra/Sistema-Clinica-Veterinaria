@@ -17,6 +17,13 @@ from app.services import (
 )
 
 
+@pytest.fixture(autouse=True)
+def mock_today(monkeypatch):
+    import datetime
+    import app.services
+    monkeypatch.setattr(app.services, "obtener_hoy", lambda: datetime.date(2026, 1, 1))
+
+
 @pytest.fixture
 def cliente_repo():
     return ClienteRepository()

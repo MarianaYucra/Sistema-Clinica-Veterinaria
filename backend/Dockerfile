@@ -12,4 +12,4 @@ COPY app ./app
 
 EXPOSE 5000
 
-CMD ["python", "-m", "app"]
+CMD gunicorn --bind "0.0.0.0:${PORT:-5000}" main:app

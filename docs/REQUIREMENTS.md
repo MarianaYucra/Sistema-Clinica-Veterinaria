@@ -1,271 +1,74 @@
-**REQUERIMIENTOS FUNCIONALES DEL SISTEMA DE CLINICA VETERINARIA**
+# REQUERIMIENTOS FUNCIONALES DEL SISTEMA DE CLÍNICA VETERINARIA
 
-| Requerimiento funcional N°: RF-01 | Nombre: Validación de ID de Cliente |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista / Administrador | |
-| Descripción: El sistema debe impedir el registro de un cliente si el ID de cliente (Cédula/DNI) está vacío o contiene solo espacios en blanco. | |
+### Módulo 1: Gestión de Clientes
 
-| Requerimiento funcional N°: RF-02 | Nombre: Validación de Duplicidad de Cliente |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista / Administrador | |
-| Descripción: El sistema debe validar que el ID del cliente no exista en el repositorio antes de proceder con el registro. | |
+| N° | Nombre | Descripción | Prioridad | Actor |
+| :--- | :--- | :--- | :--- | :--- |
+| **RF-01** | Validación de ID de Cliente | El sistema debe rechazar el registro si la Cédula/DNI no está compuesta exclusivamente por caracteres numéricos o si su longitud no se encuentra entre 8 y 12 dígitos. | Alta | Recepcionista / Administrador |
+| **RF-02** | Validación de Duplicidad de ID | El sistema debe verificar en el repositorio que la Cédula/DNI ingresada sea única. Si ya existe, la operación debe ser rechazada. | Alta | Recepcionista / Administrador |
+| **RF-03** | Validación de Nombre de Cliente | El sistema debe rechazar el registro si el nombre contiene caracteres distintos a letras y espacios, o si su longitud es inferior a 2 caracteres alfabéticos. | Alta | Recepcionista / Administrador |
+| **RF-04** | Validación de Teléfono | El sistema debe rechazar el registro si el número telefónico contiene caracteres no numéricos o si su longitud está fuera del rango de 7 a 15 dígitos. | Media | Recepcionista / Administrador |
+| **RF-05** | Validación de Formato de Email | El sistema debe validar que el correo electrónico cumpla con una estructura de formato válida (usuario@dominio.extensión). | Media | Recepcionista / Administrador |
+| **RF-06** | Validación de Duplicidad de Email | El sistema debe rechazar el registro si el correo electrónico ingresado (ignorando mayúsculas/minúsculas) ya se encuentra asociado a otro cliente en la base de datos. | Alta | Recepcionista / Administrador |
+| **RF-07** | Búsqueda Multicriterio de Cliente | El sistema debe permitir la consulta de un cliente utilizando como criterio de búsqueda su ID, su Nombre exacto o su Email exacto. Si no existe coincidencia, debe emitir un error controlado. | Media | Recepcionista / Administrador |
 
-| Requerimiento funcional N°: RF-03 | Nombre: Validación de Nombre de Cliente |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista / Administrador | |
-| Descripción: El sistema debe impedir el registro de un cliente si el nombre está vacío o contiene solo espacios en blanco. | |
+### Módulo 2: Gestión de Veterinarios
 
-| Requerimiento funcional N°: RF-04 | Nombre: Persistencia de Cliente |
-| :--- | :--- |
-| Tipo: Registro / Proceso | Prioridad: Alta |
-| Actor: Recepcionista / Administrador | |
-| Descripción: El sistema debe almacenar el ID, nombre, teléfono y correo electrónico del cliente en el repositorio, eliminando los espacios en blanco sobrantes (trimming). | |
+| N° | Nombre | Descripción | Prioridad | Actor |
+| :--- | :--- | :--- | :--- | :--- |
+| **RF-08** | Validación de ID de Veterinario | El sistema debe rechazar el registro si el ID no cumple con el formato requerido: de 1 a 5 letras opcionales, seguidas estrictamente por 3 a 6 dígitos numéricos. | Alta | Administrador |
+| **RF-09** | Validación de Duplicidad de ID | El sistema debe garantizar que el ID del veterinario (normalizado a mayúsculas) no exista previamente en la base de datos. | Alta | Administrador |
+| **RF-10** | Validación de Nombre | El sistema debe rechazar el registro si el nombre no contiene al menos 2 caracteres alfabéticos o si incluye caracteres especiales no permitidos (solo letras y espacios). | Alta | Administrador |
+| **RF-11** | Validación de Especialidad | El sistema debe rechazar el registro si la especialidad médica contiene números/símbolos o posee menos de 3 caracteres alfabéticos. | Media | Administrador |
+| **RF-12** | Búsqueda Multicriterio | El sistema debe permitir localizar veterinarios ingresando su ID (búsqueda exacta), Nombre (búsqueda exacta) o Especialidad (búsqueda parcial/coincidencias múltiples). | Media | Recepcionista / Administrador |
 
-| Requerimiento funcional N°: RF-05 | Nombre: Búsqueda de Cliente por ID |
-| :--- | :--- |
-| Tipo: Consulta | Prioridad: Alta |
-| Actor: Recepcionista / Administrador | |
-| Descripción: El sistema debe permitir la consulta y visualización de un cliente específico mediante la introducción de su ID único. | |
+### Módulo 3: Gestión de Mascotas
 
-| Requerimiento funcional N°: RF-06 | Nombre: Control de Ausencia en Búsqueda de Cliente |
-| :--- | :--- |
-| Tipo: Validación / Excepción | Prioridad: Alta |
-| Actor: Recepcionista / Administrador | |
-| Descripción: El sistema debe lanzar un mensaje de error controlado si el ID de cliente buscado no existe en los registros. | |
+| N° | Nombre | Descripción | Prioridad | Actor |
+| :--- | :--- | :--- | :--- | :--- |
+| **RF-13** | Validación de Nombre | El sistema debe rechazar el registro si el nombre contiene menos de 2 caracteres o incluye caracteres fuera del conjunto de letras y espacios. | Alta | Recepcionista |
+| **RF-14** | Validación de Especie | El sistema debe rechazar el registro si la especie contiene menos de 2 caracteres o incluye caracteres fuera del conjunto de letras y espacios. | Alta | Recepcionista |
+| **RF-15** | Validación de Raza | El sistema debe rechazar el registro si la raza contiene menos de 3 caracteres o incluye caracteres fuera del conjunto de letras y espacios. | Media | Recepcionista |
+| **RF-16** | Rango de Edad | El sistema debe rechazar el registro si la edad ingresada no es un valor entero o si se encuentra fuera del rango realista permitido (0 a 35 años). | Alta | Recepcionista |
+| **RF-17** | Rango de Peso | El sistema debe rechazar el registro si el peso no es un valor numérico o si se encuentra fuera del rango realista permitido (mayor a 0.01 y hasta 200 kg). | Alta | Recepcionista |
+| **RF-18** | Verificación de Relación Dueño-Mascota | El sistema debe verificar que el ID del cliente (dueño) ingresado exista en la base de datos antes de permitir el registro de la mascota. | Alta | Recepcionista |
 
-| Requerimiento funcional N°: RF-07 | Nombre: Listar Clientes |
-| :--- | :--- |
-| Tipo: Consulta / Reporte | Prioridad: Alta |
-| Actor: Recepcionista / Administrador | |
-| Descripción: El sistema debe recuperar y mostrar en pantalla un listado general de todos los registros de clientes almacenados. | |
+### Módulo 4: Agenda de Citas Médicas
 
-| Requerimiento funcional N°: RF-08 | Nombre: Validación de ID de Veterinario |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Administrador | |
-| Descripción: El sistema debe impedir el registro de un veterinario si su ID está vacío o contiene solo espacios en blanco. | |
+| N° | Nombre | Descripción | Prioridad | Actor |
+| :--- | :--- | :--- | :--- | :--- |
+| **RF-19** | Validación de Lógica de Fecha | El sistema debe exigir el formato de fecha YYYY-MM-DD, validar lógicamente el calendario (fechas reales) y rechazar agendamientos cuya fecha sea anterior al día actual. | Alta | Recepcionista |
+| **RF-20** | Validación de Lógica de Hora | El sistema debe exigir el formato HH:MM (24h). Si la cita se agenda para el día actual, debe verificar que la hora propuesta sea posterior a la hora actual del reloj del sistema. | Alta | Recepcionista |
+| **RF-21** | Integridad Referencial en Agenda | El sistema debe verificar que tanto el ID de la mascota (entero mayor a 0) como el ID del veterinario existan en sus respectivos repositorios antes de agendar la cita. | Alta | Recepcionista |
+| **RF-22** | Longitud de Motivo de Cita | El sistema debe rechazar el agendamiento si el texto del motivo de la cita contiene menos de 3 o más de 120 caracteres. | Media | Recepcionista |
+| **RF-23** | Prevención de Concurrencia Médica | El sistema debe rechazar la transacción si el veterinario seleccionado ya posee una cita en estado "Programada" para la misma fecha y hora solicitadas. | Alta | Recepcionista |
+| **RF-24** | Estado e ID Automáticos | El sistema debe asignar el estado por defecto "Programada" y generar un ID numérico autoincremental de forma automática al confirmar una nueva cita. | Alta | Sistema |
 
-| Requerimiento funcional N°: RF-09 | Nombre: Validación de Duplicidad de Veterinario |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Administrador | |
-| Descripción: El sistema debe validar que el ID del veterinario sea único en el sistema antes de permitir que sea guardado. | |
+### Módulo 5: Registro de Atenciones (Historial Clínico)
 
-| Requerimiento funcional N°: RF-10 | Nombre: Validación de Nombre de Veterinario |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Administrador | |
-| Descripción: El sistema debe rechazar el registro de un veterinario si el campo del nombre no es proporcionado o viene vacío. | |
+| N° | Nombre | Descripción | Prioridad | Actor |
+| :--- | :--- | :--- | :--- | :--- |
+| **RF-25** | Validación de Petición de Atención | El sistema debe exigir un ID de cita que sea un número entero mayor a cero, y verificar que dicha cita exista en la base de datos. | Alta | Veterinario |
+| **RF-26** | Verificación de Estado Vigente | El sistema debe rechazar el intento de registrar una atención si la cita solicitada no se encuentra estrictamente en el estado "Programada". | Alta | Veterinario |
+| **RF-27** | Reglas de Formato para Diagnóstico | El sistema debe rechazar la atención si el diagnóstico tiene menos de 5 o más de 200 caracteres, asegurando que contenga caracteres alfabéticos (no solo números/símbolos). | Alta | Veterinario |
+| **RF-28** | Reglas de Formato para Tratamiento | El sistema debe rechazar la atención si el tratamiento tiene menos de 5 o más de 200 caracteres, asegurando que contenga caracteres alfabéticos. | Alta | Veterinario |
+| **RF-29** | Límite de Longitud para Observaciones | El sistema debe permitir que el campo observaciones quede vacío, pero si se ingresan datos, la cadena no debe superar los 250 caracteres. | Media | Veterinario |
+| **RF-30** | Transición y Herencia de Historial | Al guardar con éxito, el sistema debe cambiar la cita a "Completada" y generar el Registro Clínico heredando inmutablemente el ID de la mascota y la fecha de la cita original. | Alta | Sistema |
+| **RF-31** | Recuperación Ordenada de Historial | El sistema debe retornar el historial completo de una mascota mediante su ID, ordenando los registros cronológicamente (ascendente) en base a la fecha de atención. | Alta | Veterinario / Recepcionista |
 
-| Requerimiento funcional N°: RF-11 | Nombre: Persistencia de Veterinario |
-| :--- | :--- |
-| Tipo: Registro / Proceso | Prioridad: Alta |
-| Actor: Administrador | |
-| Descripción: El sistema debe almacenar el ID, nombre y especialidad del veterinario, limpiando los espacios en blanco sobrantes. | |
+### Módulo 6: Calculadora de Pagos
 
-| Requerimiento funcional N°: RF-12 | Nombre: Búsqueda de Veterinario |
-| :--- | :--- |
-| Tipo: Consulta | Prioridad: Alta |
-| Actor: Administrador / Recepcionista | |
-| Descripción: El sistema debe permitir localizar y mostrar los datos de un veterinario ingresando su ID único. | |
+| N° | Nombre | Descripción | Prioridad | Actor |
+| :--- | :--- | :--- | :--- | :--- |
+| **RF-32** | Validación de Captura de Servicios | El sistema debe requerir al menos un servicio facturado con nombre válido (no vacío) y su respectivo precio. | Alta | Recepcionista |
+| **RF-33** | Reglas Numéricas de Precios | El sistema debe emitir un error y abortar el cálculo si se ingresa algún precio unitario que sea menor o igual a 0. | Alta | Recepcionista |
+| **RF-34** | Límites Porcentuales de Descuento | El sistema debe procesar el porcentaje de descuento asegurándose de que su valor numérico se encuentre estrictamente entre 0 y 100. | Media | Recepcionista |
+| **RF-35** | Cálculo Financiero Automatizado | El sistema debe sumar los precios válidos (subtotal), aplicar el porcentaje de descuento sobre este (monto deducido), y restar la deducción para retornar el total neto a pagar. | Alta | Sistema |
 
-| Requerimiento funcional N°: RF-013 | Nombre: Listar Veterinarios |
-| :--- | :--- |
-| Tipo: Consulta / Reporte | Prioridad: Alta |
-| Actor: Administrador / Recepcionista | |
-| Descripción: El sistema debe retornar y desplegar la lista completa de todos los veterinarios médicos registrados en la clínica. | |
+### Módulo 7: Interfaz y Estabilidad del Sistema
 
-| Requerimiento funcional N°: RF-14 | Nombre: Validación de Nombre de Mascota |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista | |
-| Descripción: El sistema debe rechazar el registro de la mascota si el nombre está vacío o contiene únicamente espacios en blanco. | |
-
-| Requerimiento funcional N°: RF-15 | Nombre: Validación de Existencia de Dueño |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista | |
-| Descripción: El sistema debe verificar que el ID del cliente (dueño) ingresado exista en el repositorio de clientes antes de permitir registrar la mascota. | |
-
-| Requerimiento funcional N°: RF-16 | Nombre: Validación de Edad de Mascota |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista | |
-| Descripción: El sistema debe impedir el registro si el valor numérico de la edad de la mascota es inferior a 0. | |
-
-| Requerimiento funcional N°: RF-17 | Nombre: Validación de Peso de Mascota |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista | |
-| Descripción: El sistema debe obligar a que el peso decimal de la mascota sea estrictamente mayor a 0 kg. | |
-
-| Requerimiento funcional N°: RF-19 | Nombre: Búsqueda de Mascota |
-| :--- | :--- |
-| Tipo: Consulta | Prioridad: Alta |
-| Actor: Recepcionista / Veterinario | |
-| Descripción: El sistema debe recuperar y mostrar todos los datos de una mascota introduciendo su ID entero único. | |
-
-| Requerimiento funcional N°: RF-21 | Nombre: Validación de Fecha de Cita |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista | |
-| Descripción: El sistema debe exigir una fecha obligatoria (no vacía) para poder agendar una cita médica. | |
-
-| Requerimiento funcional N°: RF-22 | Nombre: Validación de Hora de Cita |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista | |
-| Descripción: El sistema debe exigir una hora obligatoria (no vacía) para poder procesar la agenda de una cita médica. | |
-
-| Requerimiento funcional N°: RF-23 | Nombre: Validación de Mascota Existente en Cita |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista | |
-| Descripción: El sistema debe verificar en el repositorio que la mascota exista a través de su ID antes de asignarle una nueva cita. | |
-
-| Requerimiento funcional N°: RF-24 | Nombre: Validación de Veterinario Existente en Cita |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista | |
-| Descripción: El sistema debe verificar en el repositorio que el veterinario exista a través de su ID antes de asignarle una nueva cita. | |
-
-| Requerimiento funcional N°: RF-25 | Nombre: Validación de Motivo de Cita |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista | |
-| Descripción: El sistema debe rechazar el agendamiento si el campo de motivo de consulta médica está vacío. | |
-
-| Requerimiento funcional N°: RF-26 | Nombre: Validación de Concurrencia de Agenda Médica |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista / Administrador | |
-| Descripción: El sistema debe comprobar que el veterinario seleccionado no posea ya otra cita en estado "Programada" asignada exactamente en la misma fecha y hora solicitada. | |
-
-| Requerimiento funcional N°: RF-27 | Nombre: Asignación de Estado Inicial a Cita |
-| :--- | :--- |
-| Tipo: Proceso / Automatización | Prioridad: Alta |
-| Actor: Sistema | |
-| Descripción: El sistema debe asignar por defecto el estado "Programada" a cualquier cita médica que sea generada desde cero. | |
-
-| Requerimiento funcional N°: RF-28 | Nombre: Asignación de ID Autonumérico a Cita |
-| :--- | :--- |
-| Tipo: Proceso / Automatización | Prioridad: Alta |
-| Actor: Sistema | |
-| Descripción: El sistema debe generar e indexar automáticamente un ID numérico secuencial e incremental a cada nueva cita aprobada. | |
-
-| Requerimiento funcional N°: RF-29 | Nombre: Listar Citas Medicas |
-| :--- | :--- |
-| Tipo: Consulta | Prioridad: Alta |
-| Actor: Recepcionista / Veterinario | |
-| Descripción: El sistema debe mostrar todas las citas registradas en la aplicación reflejando claramente sus datos principales y su estado actual. | |
-
-| Requerimiento funcional N°: RF-30 | Nombre: Verificación de Existencia de Cita para Atención |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Veterinario | |
-| Descripción: El sistema debe comprobar que el ID de la cita médica exista en la base de datos antes de permitir al médico abrir el módulo de atención. | |
-
-| Requerimiento funcional N°: RF-31 | Nombre: Verificación de Estado Vigente de la Cita |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Veterinario | |
-| Descripción: El sistema debe validar que la cita a atender esté estrictamente en estado "Programada". Si se encuentra en otro estado, debe rechazar la transacción. | |
-
-| Requerimiento funcional N°: RF-32 | Nombre: Validación de Campo Diagnóstico |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Veterinario | |
-| Descripción: El sistema debe obligar a que el texto ingresado en el campo "Diagnóstico" no se encuentre vacío o rellenado solo de espacios. | |
-
-| Requerimiento funcional N°: RF-33 | Nombre: Validación de Campo Tratamiento |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Veterinario | |
-| Descripción: El sistema debe obligar a que el texto ingresado en el campo "Tratamiento" sea mandatorio y contenga caracteres válidos. | |
-
-| Requerimiento funcional N°: RF-34 | Nombre: Transición Automatizada de Estado de Cita |
-| :--- | :--- |
-| Tipo: Proceso / Automatización | Prioridad: Alta |
-| Actor: Sistema | |
-| Descripción: El sistema debe cambiar automáticamente el estado de la cita original de "Programada" a "Completada" al guardar con éxito la atención veterinaria. | |
-
-| Requerimiento funcional N°: RF-35 | Nombre: Persistencia de Registro Clínico |
-| :--- | :--- |
-| Tipo: Registro / Proceso | Prioridad: Alta |
-| Actor: Veterinario | |
-| Descripción: El sistema debe salvar un nuevo nodo de historial clínico heredando la fecha y el ID de mascota de la cita procesada, sumándole un ID único autoincremental de registro clínico. | |
-
-| Requerimiento funcional N°: RF-36 | Nombre: Consulta de Historial Clínico |
-| :--- | :--- |
-| Tipo: Consulta | Prioridad: Alta |
-| Actor: Veterinario | |
-| Descripción: El sistema debe permitir la extracción integral de los registros clínicos históricos asociados a una mascota ingresando su ID de paciente. | |
-
-| Requerimiento funcional N°: RF-37 | Nombre: Ordenamiento de Historial Clínico |
-| :--- | :--- |
-| Tipo: Proceso / Datos | Prioridad: Alta |
-| Actor: Sistema | |
-| Descripción: El sistema debe estructurar y ordenar cronológicamente de forma ascendente (por su fecha) todos los registros clínicos recuperados de una mascota. | |
-
-| Requerimiento funcional N°: RF-38 | Nombre: Validación de Nombre de Servicio Cobrado |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista | |
-| Descripción: El sistema debe rechazar el procesamiento del cobro si el nombre del servicio facturado se envía en blanco. | |
-
-| Requerimiento funcional N°: RF-39 | Nombre: Validación de Rango de Precio Unitario |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista | |
-| Descripción: El sistema debe emitir un error y detener el cálculo matemático de caja si algún precio unitario digitado es igual o menor a 0. | |
-
-| Requerimiento funcional N°: RF-40 | Nombre: Cálculo Automatizado de Subtotal |
-| :--- | :--- |
-| Tipo: Proceso | Prioridad: Alta |
-| Actor: Sistema | |
-| Descripción: El sistema debe sumar de manera íntegra y precisa los precios de todos los servicios ingresados para obtener el subtotal bruto. | |
-
-| Requerimiento funcional N°: RF-41 | Nombre: Validación del Rango Porcentual de Descuento |
-| :--- | :--- |
-| Tipo: Validación | Prioridad: Alta |
-| Actor: Recepcionista | |
-| Descripción: El sistema debe validar aritméticamente que el porcentaje de descuento capturado se mantenga estrictamente entre los valores numéricos de 0 y 100. | |
-
-| Requerimiento funcional N°: RF-42 | Nombre: Cálculo de Deducción por Descuento |
-| :--- | :--- |
-| Tipo: Proceso / Cálculo | Prioridad: Alta |
-| Actor: Sistema | |
-| Descripción: El sistema debe calcular el monto monetario a deducir aplicando la fórmula matemática de porcentaje sobre el subtotal bruto del pago actual. | |
-
-| Requerimiento funcional N°: RF-43 | Nombre: Cálculo de Total Neto a Pagar |
-| :--- | :--- |
-| Tipo: Proceso / Cálculo | Prioridad: Alta |
-| Actor: Sistema | |
-| Descripción: El sistema debe restar el monto calculado por concepto de descuento al subtotal bruto para renderizar e imprimir en pantalla el total neto final a pagar por el cliente. | |
-
-| Requerimiento funcional N°: RF-44 | Nombre: Despliegue de Menú de Opciones Principal |
-| :--- | :--- |
-| Tipo: InteRF-az de usuario | Prioridad: Alta |
-| Actor: Sistema | |
-| Descripción: El sistema debe renderizar mediante caracteres estándar un menú interactivo en la consola con 14 comandos lógicos ejecutables (opciones del 0 al 13). | |
-
-| Requerimiento funcional N°: RF-45 | Nombre: Captura y Validación de Datos Tipo Entero |
-| :--- | :--- |
-| Tipo: Validación / InteRF-az | Prioridad: Alta |
-| Actor: Sistema | |
-| Descripción: El sistema debe atrapar las excepciones de entrada de datos (ValueError) cuando se solicita un dato entero (IDs numéricos, opciones del menú) y solicitar la re-introducción del dato hasta recibir un formato numérico válido. | |
-
-| Requerimiento funcional N°: RF-46 | Nombre: Captura y Validación de Datos Tipo Flotante |
-| :--- | :--- |
-| Tipo: Validación / InteRF-az | Prioridad: Alta |
-| Actor: Sistema | |
-| Descripción: El sistema debe verificar de forma activa que los valores de entrada designados como decimales (pesos, precios) contengan una estructura numérica válida antes de enviarla a las capas del servicio. | |
-
-| Requerimiento funcional N°: RF-47 | Nombre: Manejo Seguro de Interrupción por Teclado |
-| :--- | :--- |
-| Tipo: Excepción / Control | Prioridad: Alta |
-| Actor: Sistema | |
-| Descripción: El sistema debe capturar el evento nativo KeyboardInterrupt (Ctrl+C) gatillado por el usuario con el fin de abortar de forma limpia el flujo actual o salir del sistema sin corromper la memoria volátil de la aplicación. | |
+| N° | Nombre | Descripción | Prioridad | Actor |
+| :--- | :--- | :--- | :--- | :--- |
+| **RF-36** | Despliegue de Menú Interactivo | El sistema debe renderizar un menú en consola con opciones numéricas predefinidas del 0 al 13 que mapeen correctamente a cada funcionalidad del negocio. | Baja | Sistema |
+| **RF-37** | Captura de Fallos de Tipo (Tipado) | El sistema debe atrapar excepciones cuando se ingrese texto en lugar de números (enteros o flotantes), evitando colapsos del programa y solicitando el reingreso del dato. | Alta | Sistema |
+| **RF-38** | Manejo de Interrupciones (Fail-Safe) | El sistema debe interceptar comandos de cancelación (Ctrl+C / KeyboardInterrupt) para cancelar la operación de forma limpia, retornando al menú o saliendo sin corromper memoria. | Alta | Sistema |

@@ -1,5 +1,6 @@
 .git
 .github
+
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -9,9 +10,20 @@ __pycache__/
 backend/.venv/
 venv/
 env/
+<<<<<<< HEAD
 node_modules/
 frontend/node_modules/
 frontend/.svelte-kit/
 frontend/build/
 data/
 .DS_Store
+=======
+.DS_Store
+
+docs/
+tests/
+data/
+app/templates/
+app/static/
+app/webapp.py
+>>>>>>> origin/main

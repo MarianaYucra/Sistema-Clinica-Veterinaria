@@ -66,6 +66,10 @@ def create_app() -> Flask:
     def database_error(error):
         return jsonify({"error": "Error de base de datos.", "detail": str(error)}), 500
 
+    @app.get("/")
+    def hello_world():
+        return jsonify({"status": "ok 200"})
+   
     @app.get("/health")
     def health():
         return jsonify({"status": "ok"})
@@ -133,6 +137,4 @@ def create_app() -> Flask:
     def get_historial(id_mascota: int):
         return jsonify(_list(atenciones.historial(id_mascota)))
     
-    initialize_database()
-
     return app

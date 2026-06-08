@@ -1,3 +1,4 @@
+# docker compose for local development or cloud (right now we are using vercel so this is not being used)
 services:
   database:
     image: postgres:17-alpine
@@ -6,7 +7,7 @@ services:
       POSTGRES_USER: clinic
       POSTGRES_PASSWORD: clinic
     ports:
-      - "5432:5432"
+      - "5555:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

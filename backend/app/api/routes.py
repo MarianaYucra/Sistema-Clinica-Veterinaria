@@ -132,5 +132,7 @@ def create_app() -> Flask:
     @app.get("/api/mascotas/<int:id_mascota>/historial")
     def get_historial(id_mascota: int):
         return jsonify(_list(atenciones.historial(id_mascota)))
+    
+    initialize_database()
 
     return app

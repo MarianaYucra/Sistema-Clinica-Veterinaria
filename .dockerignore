@@ -7,8 +7,17 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .venv/
+backend/.venv/
 venv/
 env/
+<<<<<<< HEAD
+node_modules/
+frontend/node_modules/
+frontend/.svelte-kit/
+frontend/build/
+data/
+.DS_Store
+=======
 .DS_Store
 
 docs/
@@ -17,3 +26,4 @@ data/
 app/templates/
 app/static/
 app/webapp.py
+>>>>>>> origin/main

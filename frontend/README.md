@@ -1,42 +1,13 @@
-# sv
+# Frontend
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+SvelteKit client for the veterinary clinic API.
 
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project
-npx sv create my-app
+```bash
+cd frontend
+pnpm install
+VITE_API_URL=http://localhost:5000 pnpm dev
 ```
 
-To recreate this project with the same configuration:
+The first screen is the operational app. It includes summary counters, create forms and lists for clients, veterinarians, pets and appointments.
 
-```sh
-# recreate this project
-pnpm dlx sv@0.15.4 create --template minimal --types ts --install pnpm frontend
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+All submitted data is still validated in the Flask backend. Browser validation is only a first usability layer.

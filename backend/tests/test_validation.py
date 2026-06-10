@@ -29,3 +29,8 @@ def test_appointment_date_rejects_past_dates():
 def test_weight_must_be_positive():
     with pytest.raises(ValueError):
         v.weight(0)
+
+
+def test_age_rejects_decimal_values():
+    with pytest.raises(ValueError):
+        v.age(3.5)

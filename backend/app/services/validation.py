@@ -57,6 +57,10 @@ def veterinarian_id(value: Any) -> str:
 def positive_int(value: Any, field: str) -> int:
     if isinstance(value, bool):
         raise ValueError(f"{field} debe ser un numero entero.")
+    if isinstance(value, float) and not value.is_integer():
+        raise ValueError(f"{field} debe ser un numero entero.")
+    if isinstance(value, str) and not value.strip().isdigit():
+        raise ValueError(f"{field} debe ser un numero entero.")
     try:
         number = int(value)
     except (TypeError, ValueError) as exc:
@@ -68,6 +72,10 @@ def positive_int(value: Any, field: str) -> int:
 
 def age(value: Any) -> int:
     if isinstance(value, bool):
+        raise ValueError("La edad debe ser un numero entero.")
+    if isinstance(value, float) and not value.is_integer():
+        raise ValueError("La edad debe ser un numero entero.")
+    if isinstance(value, str) and not value.strip().isdigit():
         raise ValueError("La edad debe ser un numero entero.")
     try:
         number = int(value)
